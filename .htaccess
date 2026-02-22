@@ -1,0 +1,27 @@
+
+RewriteOptions inherit
+
+RewriteEngine on
+
+# Redirect www to non-www
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
+# Redirect to HTTPS is temporarily disabled for testing
+# RewriteCond %{HTTPS} off
+# RewriteCond %{REQUEST_URI} !^/attendance_api\.php
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Set default index file
+DirectoryIndex index.php index.html
+
+# Custom error pages
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# Prevent directory listing
+Options -Indexes
+RewriteCond %{HTTP_HOST} ^learn\.finoteselamss\.org$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.learn\.finoteselamss\.org$
+RewriteRule ^home\/finotekv\/learn\.finoteselamss\.org$ "https\:\/\/learn\.finoteselamss\.org\/" [R=301,L]
+

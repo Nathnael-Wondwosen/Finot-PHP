@@ -1,0 +1,762 @@
+[10-Oct-2025 06:33:17 UTC] Filter API Debug - Received filters: []
+[10-Oct-2025 06:33:17 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[10-Oct-2025 06:33:17 UTC] Filter API Debug - Parameters: []
+[10-Oct-2025 06:33:17 UTC] Filter API Debug - Found 1111 students
+[10-Oct-2025 06:34:28 UTC] Filter API Debug - Received filters: {"grade":"","gender":"","birthMonth":"","instrument":"masenqo","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[10-Oct-2025 06:34:28 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND ir.instrument LIKE ? GROUP BY s.id ORDER BY s.full_name
+[10-Oct-2025 06:34:28 UTC] Filter API Debug - Parameters: ["%masenqo%"]
+[10-Oct-2025 06:34:28 UTC] Filter API Debug - Found 1 students
+[10-Oct-2025 06:35:22 UTC] API Debug: ID=115, Table=instruments
+[10-Oct-2025 06:35:22 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:35:22 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:35:28 UTC] API Debug: ID=113, Table=instruments
+[10-Oct-2025 06:35:28 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:35:28 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:35:31 UTC] API Debug: ID=111, Table=instruments
+[10-Oct-2025 06:35:31 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:35:31 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:35:34 UTC] API Debug: ID=110, Table=instruments
+[10-Oct-2025 06:35:34 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:35:34 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:35:38 UTC] API Debug: ID=106, Table=instruments
+[10-Oct-2025 06:35:38 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:35:38 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:35:44 UTC] API Debug: ID=100, Table=instruments
+[10-Oct-2025 06:35:44 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:35:44 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:36:16 UTC] API Debug: ID=93, Table=instruments
+[10-Oct-2025 06:36:16 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:36:16 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:36:23 UTC] API Debug: ID=94, Table=instruments
+[10-Oct-2025 06:36:23 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:36:23 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:36:29 UTC] API Debug: ID=95, Table=instruments
+[10-Oct-2025 06:36:29 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:36:29 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 06:36:36 UTC] API Debug: ID=96, Table=instruments
+[10-Oct-2025 06:36:36 UTC] API Debug: Session admin_id=3
+[10-Oct-2025 06:36:36 UTC] API Debug: Session data=Array
+(
+    [admin_id] => 3
+    [admin_username] => admin
+)
+
+[10-Oct-2025 16:58:45 UTC] Filter API Debug - Received filters: []
+[10-Oct-2025 16:58:45 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[10-Oct-2025 16:58:45 UTC] Filter API Debug - Parameters: []
+[10-Oct-2025 16:58:45 UTC] Filter API Debug - Found 1112 students
+[10-Oct-2025 16:59:02 UTC] Filter API Debug - Received filters: {"grade":"9th","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[10-Oct-2025 16:59:02 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[10-Oct-2025 16:59:02 UTC] Filter API Debug - Parameters: ["9th"]
+[10-Oct-2025 16:59:02 UTC] Filter API Debug - Found 34 students
+[10-Oct-2025 17:01:33 UTC] Filter API Debug - Received filters: {"grade":"10th","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[10-Oct-2025 17:01:33 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[10-Oct-2025 17:01:33 UTC] Filter API Debug - Parameters: ["10th"]
+[10-Oct-2025 17:01:33 UTC] Filter API Debug - Found 28 students
+[11-Oct-2025 13:35:22 UTC] Filter API Debug - Received filters: []
+[11-Oct-2025 13:35:22 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[11-Oct-2025 13:35:22 UTC] Filter API Debug - Parameters: []
+[11-Oct-2025 13:35:22 UTC] Filter API Debug - Found 1115 students
+[11-Oct-2025 13:35:44 UTC] Filter API Debug - Received filters: {"grade":"5th","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[11-Oct-2025 13:35:44 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[11-Oct-2025 13:35:44 UTC] Filter API Debug - Parameters: ["5th"]
+[11-Oct-2025 13:35:44 UTC] Filter API Debug - Found 74 students
+[11-Oct-2025 13:36:18 UTC] Filter API Debug - Received filters: {"grade":"6th","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[11-Oct-2025 13:36:18 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[11-Oct-2025 13:36:18 UTC] Filter API Debug - Parameters: ["6th"]
+[11-Oct-2025 13:36:18 UTC] Filter API Debug - Found 63 students
+[11-Oct-2025 13:36:39 UTC] Filter API Debug - Received filters: {"grade":"","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[11-Oct-2025 13:36:39 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[11-Oct-2025 13:36:39 UTC] Filter API Debug - Parameters: []
+[11-Oct-2025 13:36:39 UTC] Filter API Debug - Found 1115 students
+[11-Oct-2025 13:59:38 UTC] Filter API Debug - Received filters: []
+[11-Oct-2025 13:59:38 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[11-Oct-2025 13:59:38 UTC] Filter API Debug - Parameters: []
+[11-Oct-2025 13:59:38 UTC] Filter API Debug - Found 1115 students
+[11-Oct-2025 14:00:47 UTC] Filter API Debug - Received filters: []
+[11-Oct-2025 14:00:47 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[11-Oct-2025 14:00:47 UTC] Filter API Debug - Parameters: []
+[11-Oct-2025 14:00:47 UTC] Filter API Debug - Found 1115 students
+[11-Oct-2025 14:02:01 UTC] Filter API Debug - Received filters: {"grade":"","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[11-Oct-2025 14:02:01 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[11-Oct-2025 14:02:01 UTC] Filter API Debug - Parameters: []
+[11-Oct-2025 14:02:01 UTC] Filter API Debug - Found 1115 students
+[12-Oct-2025 05:31:14 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 05:31:14 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 05:31:14 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 05:31:14 UTC] Filter API Debug - Found 1118 students
+[12-Oct-2025 05:31:27 UTC] Filter API Debug - Received filters: {"grade":"new","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 05:31:27 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 05:31:27 UTC] Filter API Debug - Parameters: ["new"]
+[12-Oct-2025 05:31:27 UTC] Filter API Debug - Found 376 students
+[12-Oct-2025 05:31:58 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 05:31:58 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 05:31:58 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 05:31:58 UTC] Filter API Debug - Found 1118 students
+[12-Oct-2025 05:32:11 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 05:32:11 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 05:32:11 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 05:32:11 UTC] Filter API Debug - Found 1118 students
+[12-Oct-2025 05:32:18 UTC] Filter API Debug - Received filters: {"grade":"new","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 05:32:18 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 05:32:18 UTC] Filter API Debug - Parameters: ["new"]
+[12-Oct-2025 05:32:18 UTC] Filter API Debug - Found 376 students
+[12-Oct-2025 06:23:17 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 06:23:17 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:23:17 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:23:17 UTC] Filter API Debug - Found 1125 students
+[12-Oct-2025 06:23:26 UTC] Filter API Debug - Received filters: {"grade":"","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 06:23:26 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:23:26 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:23:27 UTC] Filter API Debug - Found 1125 students
+[12-Oct-2025 06:24:24 UTC] Filter API Debug - Received filters: {"grade":"","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 06:24:24 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:24:24 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:24:24 UTC] Filter API Debug - Found 1125 students
+[12-Oct-2025 06:37:56 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 06:37:56 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:37:56 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:37:56 UTC] Filter API Debug - Found 1126 students
+[12-Oct-2025 06:38:46 UTC] Filter API Debug - Received filters: {"grade":"","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 06:38:46 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:38:46 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:38:46 UTC] Filter API Debug - Found 1126 students
+[12-Oct-2025 06:40:22 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 06:40:22 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:40:22 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:40:22 UTC] Filter API Debug - Found 1126 students
+[12-Oct-2025 06:40:36 UTC] Filter API Debug - Received filters: {"grade":"2nd","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 06:40:36 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:40:36 UTC] Filter API Debug - Parameters: ["2nd"]
+[12-Oct-2025 06:40:36 UTC] Filter API Debug - Found 108 students
+[12-Oct-2025 06:41:27 UTC] Filter API Debug - Received filters: {"grade":"1st","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 06:41:27 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:41:27 UTC] Filter API Debug - Parameters: ["1st"]
+[12-Oct-2025 06:41:27 UTC] Filter API Debug - Found 115 students
+[12-Oct-2025 06:47:29 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 06:47:29 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:47:29 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:47:29 UTC] Filter API Debug - Found 1127 students
+[12-Oct-2025 06:47:51 UTC] Filter API Debug - Received filters: {"grade":"new","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 06:47:51 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:47:51 UTC] Filter API Debug - Parameters: ["new"]
+[12-Oct-2025 06:47:51 UTC] Filter API Debug - Found 376 students
+[12-Oct-2025 06:48:36 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 06:48:36 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:48:36 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:48:37 UTC] Filter API Debug - Found 1127 students
+[12-Oct-2025 06:48:42 UTC] Filter API Debug - Received filters: {"grade":"","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 06:48:42 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 06:48:42 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 06:48:42 UTC] Filter API Debug - Found 1127 students
+[12-Oct-2025 10:40:55 UTC] Filter API Debug - Received filters: []
+[12-Oct-2025 10:40:55 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 10:40:55 UTC] Filter API Debug - Parameters: []
+[12-Oct-2025 10:40:55 UTC] Filter API Debug - Found 1137 students
+[12-Oct-2025 10:41:16 UTC] Filter API Debug - Received filters: {"grade":"9th","gender":"","birthMonth":"","instrument":"","spiritualFather":"","subCity":"","livingWith":"","disability":""}
+[12-Oct-2025 10:41:16 UTC] Filter API Debug - Final query: 
+        SELECT DISTINCT
+            s.id,
+            s.full_name,
+            s.christian_name,
+            s.gender,
+            s.birth_date,
+            s.current_grade,
+            s.sub_city,
+            s.living_with,
+            s.physical_disability,
+            s.has_spiritual_father,
+            s.phone_number,
+            s.emergency_phone,
+            GROUP_CONCAT(DISTINCT ir.instrument) as instruments
+        FROM students s
+        LEFT JOIN instrument_registrations ir ON s.id = ir.student_id
+        WHERE 1=1
+     AND s.current_grade = ? GROUP BY s.id ORDER BY s.full_name
+[12-Oct-2025 10:41:16 UTC] Filter API Debug - Parameters: ["9th"]
+[12-Oct-2025 10:41:16 UTC] Filter API Debug - Found 35 students
