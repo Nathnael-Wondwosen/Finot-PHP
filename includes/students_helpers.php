@@ -1,32 +1,60 @@
 <?php
-// includes/students_helpers.php
+// includes/students_helpers.php - Optimized for Production
+require_once __DIR__ . '/cache_manager.php';
+
+// Cache TTL constants
+const CACHE_TTL_STUDENTS = 300; // 5 minutes for student lists
+const CACHE_TTL_COUNTS = 600;   // 10 minutes for counts
+const CACHE_TTL_DASHBOARD = 180; // 3 minutes for dashboard stats
+
 if (!function_exists('fetch_all_students_with_parents')) {
     function fetch_all_students_with_parents(PDO $pdo, $page = 1, $per_page = 50) {
-        $offset = ($page - 1) * $per_page;
-        $sql = "SELECT s.*, 
-            f.full_name AS father_full_name, f.phone_number AS father_phone, f.occupation AS father_occupation,
-            m.full_name AS mother_full_name, m.phone_number AS mother_phone, m.occupation AS mother_occupation,
-            g.full_name AS guardian_full_name, g.phone_number AS guardian_phone, g.occupation AS guardian_occupation
-        FROM students s
-        LEFT JOIN parents f ON s.id = f.student_id AND f.parent_type = 'father'
-        LEFT JOIN parents m ON s.id = m.student_id AND m.parent_type = 'mother'
-        LEFT JOIN parents g ON s.id = g.student_id AND g.parent_type = 'guardian'
-        ORDER BY s.created_at DESC
-        LIMIT :limit OFFSET :offset";
+        $cacheKey = "students_page_{$page}_{$per_page}";
         
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':limit', $per_page, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return cache_remember($cacheKey, function() use ($pdo, $page, $per_page) {
+            $offset = ($page - 1) * $per_page;
+            $sql = "SELECT s.*, 
+                f.full_name AS father_full_name, f.phone_number AS father_phone, f.occupation AS father_occupation,
+                m.full_name AS mother_full_name, m.phone_number AS mother_phone, m.occupation AS mother_occupation,
+                g.full_name AS guardian_full_name, g.phone_number AS guardian_phone, g.occupation AS guardian_occupation
+            FROM students s
+            LEFT JOIN parents f ON s.id = f.student_id AND f.parent_type = 'father'
+            LEFT JOIN parents m ON s.id = m.student_id AND m.parent_type = 'mother'
+            LEFT JOIN parents g ON s.id = g.student_id AND g.parent_type = 'guardian'
+            ORDER BY s.created_at DESC
+            LIMIT :limit OFFSET :offset";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindValue(':limit', $per_page, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }, CACHE_TTL_STUDENTS, 'students');
     }
 }
 
-// DB-level filtered fetch with pagination and parent joins for student views
+// DB-level filtered fetch with pagination and parent joins for student views - OPTIMIZED
 if (!function_exists('fetch_students_with_parents_filtered')) {
     function fetch_students_with_parents_filtered(PDO $pdo, string $view = 'all', string $search = '', string $date_from = '', string $date_to = '', int $page = 1, int $per_page = 25) {
+        // Skip cache for search queries
+        if (!empty($search)) {
+            return fetch_students_with_parents_filtered_query($pdo, $view, $search, $date_from, $date_to, $page, $per_page);
+        }
+        
+        $cacheKey = "students_filtered_{$view}_{$date_from}_{$date_to}_{$page}_{$per_page}";
+        
+        return cache_remember($cacheKey, function() use ($pdo, $view, $search, $date_from, $date_to, $page, $per_page) {
+            return fetch_students_with_parents_filtered_query($pdo, $view, $search, $date_from, $date_to, $page, $per_page);
+        }, CACHE_TTL_STUDENTS, 'students');
+    }
+    
+    function fetch_students_with_parents_filtered_query(PDO $pdo, string $view, string $search, string $date_from, string $date_to, int $page, int $per_page) {
         $offset = ($page - 1) * $per_page;
-        $sql = "SELECT s.*, 
+        
+        // Optimized query - select only needed columns instead of s.*
+        $sql = "SELECT s.id, s.photo_path, s.full_name, s.christian_name, s.gender, s.birth_date, 
+                s.current_grade, s.school_year_start, s.phone_number, s.education_level, 
+                s.field_of_study, s.sub_city, s.district, s.created_at,
             f.full_name AS father_full_name, f.phone_number AS father_phone, f.occupation AS father_occupation,
             m.full_name AS mother_full_name, m.phone_number AS mother_phone, m.occupation AS mother_occupation,
             g.full_name AS guardian_full_name, g.phone_number AS guardian_phone, g.occupation AS guardian_occupation
@@ -54,7 +82,7 @@ if (!function_exists('fetch_students_with_parents_filtered')) {
             $params[] = $date_to . ' 23:59:59';
         }
 
-        // Age group condition
+        // Age group condition - optimized
         $currentEY = current_ethiopian_year();
         if ($view === 'youth') {
             $where_conditions[] = "(s.birth_date IS NOT NULL AND s.birth_date <> '0000-00-00' AND (? - CAST(SUBSTRING(s.birth_date,1,4) AS UNSIGNED)) >= 17)";
@@ -71,7 +99,6 @@ if (!function_exists('fetch_students_with_parents_filtered')) {
         $sql .= " ORDER BY s.created_at DESC LIMIT ? OFFSET ?";
 
         $stmt = $pdo->prepare($sql);
-        // Bind positional params including limit/offset
         $bindIndex = 1;
         foreach ($params as $val) {
             $stmt->bindValue($bindIndex++, $val);
@@ -84,8 +111,10 @@ if (!function_exists('fetch_students_with_parents_filtered')) {
 }
 if (!function_exists('get_total_students_count')) {
     function get_total_students_count(PDO $pdo) {
-        $sql = "SELECT COUNT(*) FROM students";
-        return $pdo->query($sql)->fetchColumn();
+        return cache_remember('total_students_count', function() use ($pdo) {
+            $sql = "SELECT COUNT(*) FROM students";
+            return (int) $pdo->query($sql)->fetchColumn();
+        }, CACHE_TTL_COUNTS, 'counts');
     }
 }
 

@@ -3,7 +3,11 @@ session_start();
 require 'config.php';
 require 'includes/admin_layout.php';
 require 'includes/mobile_table.php';
+require 'includes/cache_manager.php';
 requireAdminLogin();
+
+// Enable output buffering for performance
+ob_start();
 
 // List of all possible student fields (columns)
 $all_student_fields = [
@@ -66,17 +70,21 @@ if ($pref_row && !empty($pref_row['column_list'])) {
     $selected_fields = ['photo_path','full_name','gender','current_grade','phone_number','field_of_study','created_at'];
 }
 
-// Fetch all students with parent info for the dashboard list
-$sql = "SELECT s.*, 
-    f.full_name AS father_full_name, f.phone_number AS father_phone, f.occupation AS father_occupation,
-    m.full_name AS mother_full_name, m.phone_number AS mother_phone, m.occupation AS mother_occupation,
-    g.full_name AS guardian_full_name, g.phone_number AS guardian_phone, g.occupation AS guardian_occupation
-FROM students s
-LEFT JOIN parents f ON s.id = f.student_id AND f.parent_type = 'father'
-LEFT JOIN parents m ON s.id = m.student_id AND m.parent_type = 'mother'
-LEFT JOIN parents g ON s.id = g.student_id AND g.parent_type = 'guardian'
-ORDER BY s.created_at DESC";
-$students = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+// Fetch students with caching for better performance
+$students = cache_remember('dashboard_students_list', function() use ($pdo) {
+    $sql = "SELECT s.id, s.photo_path, s.full_name, s.christian_name, s.gender, s.birth_date, 
+            s.current_grade, s.phone_number, s.created_at,
+            f.full_name AS father_full_name, f.phone_number AS father_phone, 
+            m.full_name AS mother_full_name, m.phone_number AS mother_phone,
+            g.full_name AS guardian_full_name, g.phone_number AS guardian_phone
+        FROM students s
+        LEFT JOIN parents f ON s.id = f.student_id AND f.parent_type = 'father'
+        LEFT JOIN parents m ON s.id = m.student_id AND m.parent_type = 'mother'
+        LEFT JOIN parents g ON s.id = g.student_id AND g.parent_type = 'guardian'
+        ORDER BY s.created_at DESC
+        LIMIT 100"; // Limit for dashboard performance
+    return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}, CACHE_TTL_DASHBOARD, 'dashboard');
 
 // Calculate advanced statistics
 $total_students = count($students);
