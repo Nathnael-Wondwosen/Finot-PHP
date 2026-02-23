@@ -42,10 +42,10 @@ if (!ob_get_level() && !ini_get('zlib.output_compression')) {
 }
 
 // Database configuration - UPDATE THESE FOR PRODUCTION
-$host = 'localhost';
-$dbname = 'finotdb';
-$username = 'root';
-$password = '';
+$host = '91.204.209.23';
+$dbname = 'finotekv_Finot';
+$username = 'finotekv_it';
+$password = 'finoteselam.27';
 
 // Production security headers
 header('X-Content-Type-Options: nosniff');
