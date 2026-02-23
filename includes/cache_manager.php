@@ -148,23 +148,34 @@ class CacheManager {
 
 /**
  * Global cache helper functions
+ * Use function_exists to prevent redeclaration errors
  */
-function cache_get($key, $group = 'default') {
-    return CacheManager::getInstance()->get($key, $group);
+if (!function_exists('cache_get')) {
+    function cache_get($key, $group = 'default') {
+        return CacheManager::getInstance()->get($key, $group);
+    }
 }
 
-function cache_set($key, $value, $ttl = null, $group = 'default') {
-    return CacheManager::getInstance()->set($key, $value, $ttl, $group);
+if (!function_exists('cache_set')) {
+    function cache_set($key, $value, $ttl = null, $group = 'default') {
+        return CacheManager::getInstance()->set($key, $value, $ttl, $group);
+    }
 }
 
-function cache_remember($key, $callback, $ttl = null, $group = 'db_queries') {
-    return CacheManager::getInstance()->remember($key, $callback, $ttl, $group);
+if (!function_exists('cache_remember')) {
+    function cache_remember($key, $callback, $ttl = null, $group = 'db_queries') {
+        return CacheManager::getInstance()->remember($key, $callback, $ttl, $group);
+    }
 }
 
-function cache_clear($group = null) {
-    return CacheManager::getInstance()->clear($group);
+if (!function_exists('cache_clear')) {
+    function cache_clear($group = null) {
+        return CacheManager::getInstance()->clear($group);
+    }
 }
 
-function cache_delete($key, $group = 'default') {
-    return CacheManager::getInstance()->delete($key, $group);
+if (!function_exists('cache_delete')) {
+    function cache_delete($key, $group = 'default') {
+        return CacheManager::getInstance()->delete($key, $group);
+    }
 }

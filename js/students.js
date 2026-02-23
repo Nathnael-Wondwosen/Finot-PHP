@@ -1,3 +1,88 @@
+// AJAX: Load students table data dynamically
+function loadStudentsAjax(params = {}) {
+    const tableBody = document.querySelector('#students-table-view tbody');
+    const paginationContainer = document.getElementById('students-pagination');
+    if (!tableBody) return;
+
+    // Show loading spinner
+    tableBody.innerHTML = '<tr><td colspan="99" class="text-center py-8"><div class="flex justify-center"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div></td></tr>';
+    if (paginationContainer) paginationContainer.innerHTML = '';
+
+    // Gather parameters
+    const page = params.page || 1;
+    const per_page = params.per_page || 25;
+    const view = params.view || currentView;
+    const search = params.search || document.getElementById('studentSearch')?.value || '';
+    const date_from = params.date_from || '';
+    const date_to = params.date_to || '';
+
+    const postData = new URLSearchParams({
+        action: 'get_students_ajax',
+        page,
+        per_page,
+        view,
+        search,
+        date_from,
+        date_to
+    });
+
+    fetch('students.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: postData.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            tableBody.innerHTML = '<tr><td colspan="99" class="text-center text-red-500 py-8">' + (data.message || 'Failed to load data') + '</td></tr>';
+            return;
+        }
+        // Render rows
+        if (!data.students || data.students.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="99" class="text-center py-8 text-gray-400">No students found.</td></tr>';
+        } else {
+            let rows = '';
+            data.students.forEach(student => {
+                rows += renderStudentRow(student);
+            });
+            tableBody.innerHTML = rows;
+        }
+        // Render pagination
+        if (paginationContainer) {
+            paginationContainer.innerHTML = renderPagination(data.page, data.per_page, data.total);
+        }
+    })
+    .catch(err => {
+        tableBody.innerHTML = '<tr><td colspan="99" class="text-center text-red-500 py-8">Error loading data</td></tr>';
+    });
+}
+
+// Render a single student row (customize as needed)
+function renderStudentRow(student) {
+    // Adjust columns as needed for your table
+    return `<tr data-student-id="${student.id}">
+        <td><img src="${student.photo_path || ''}" class="w-8 h-8 rounded-full object-cover" onerror="this.src='assets/img/default-user.png'" /></td>
+        <td>${student.full_name || ''}</td>
+        <td>${student.christian_name || ''}</td>
+        <td>${student.gender || ''}</td>
+        <td>${student.birth_date || ''}</td>
+        <td>${student.current_grade || ''}</td>
+        <td>${student.phone_number || ''}</td>
+        <td><button onclick="viewStudentDetails(${student.id})" class="text-blue-600 hover:underline">View</button></td>
+    </tr>`;
+}
+
+// Render pagination controls
+function renderPagination(page, per_page, total) {
+    const totalPages = Math.ceil(total / per_page);
+    if (totalPages <= 1) return '';
+    let html = '<div class="flex justify-center gap-1">';
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="px-2 py-1 rounded ${i === page ? 'bg-primary-600 text-white' : 'bg-gray-200'}" onclick="loadStudentsAjax({page:${i}})">${i}</button>`;
+    }
+    html += '</div>';
+    return html;
+}
 /**
  * Students Page JavaScript Functions
  * Fixed and optimized version

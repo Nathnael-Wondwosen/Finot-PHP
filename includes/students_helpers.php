@@ -8,6 +8,16 @@ const CACHE_TTL_COUNTS = 600;   // 10 minutes for counts
 const CACHE_TTL_DASHBOARD = 180; // 3 minutes for dashboard stats
 
 if (!function_exists('fetch_all_students_with_parents')) {
+    // Cache TTL constants - only define if not already defined
+    if (!defined('CACHE_TTL_STUDENTS')) {
+        define('CACHE_TTL_STUDENTS', 300); // 5 minutes for student lists
+    }
+    if (!defined('CACHE_TTL_COUNTS')) {
+        define('CACHE_TTL_COUNTS', 600);   // 10 minutes for counts
+    }
+    if (!defined('CACHE_TTL_DASHBOARD')) {
+        define('CACHE_TTL_DASHBOARD', 180); // 3 minutes for dashboard stats
+    }
     function fetch_all_students_with_parents(PDO $pdo, $page = 1, $per_page = 50) {
         $cacheKey = "students_page_{$page}_{$per_page}";
         

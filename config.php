@@ -2,7 +2,7 @@
 // config.php - Production-Optimized Configuration
 
 // Disable error display in production (set to 1 for debugging only)
-define('DEBUG_MODE', 0);
+define('DEBUG_MODE', 1);
 if (!DEBUG_MODE) {
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -65,15 +65,15 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
         PDO::ATTR_PERSISTENT => true,
-        PDO::MYSQL_ATTR_INIT_COMMAND => "SET SESSION sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',
-            SET SESSION wait_timeout=28800,
-            SET SESSION interactive_timeout=28800",
         PDO::ATTR_STRINGIFY_FETCHES => false,
         PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL
     ]);
     
-    // Set connection charset
+    // Set connection charset and session variables
     $pdo->exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
+    $pdo->exec("SET SESSION sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
+    $pdo->exec("SET SESSION wait_timeout=28800");
+    $pdo->exec("SET SESSION interactive_timeout=28800");
     
 } catch (PDOException $e) {
     error_log("Database connection failed: " . $e->getMessage());

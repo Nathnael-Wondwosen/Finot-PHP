@@ -1,5 +1,7 @@
 <?php
-// Admin Layout Component
+require_once __DIR__ . '/cache_manager.php';
+
+// Admin Layout Component with Performance Optimizations
 if (!isset($_SESSION)) {
     session_start();
 }
@@ -7,7 +9,39 @@ if (!isset($_SESSION)) {
 // Get current page name for navigation highlighting
 $current_page = basename($_SERVER['PHP_SELF'], '.php');
 
-// Define navigation items
+// Cache navigation badges to avoid repeated database queries
+$nav_badges_cache_key = 'admin_nav_badges_' . ($_SESSION['admin_id'] ?? 1);
+$nav_badges = cache_get($nav_badges_cache_key, 300); // 5 minutes cache
+
+if ($nav_badges === null) {
+    // Calculate badges that require database queries
+    try {
+        $stmt = $pdo->query("SELECT COUNT(*) as total_students FROM students");
+        $total_students = $stmt->fetch(PDO::FETCH_ASSOC)['total_students'];
+
+        $stmt = $pdo->query("SELECT COUNT(*) as flagged_students FROM students WHERE flagged = 1");
+        $flagged_students = $stmt->fetch(PDO::FETCH_ASSOC)['flagged_students'];
+
+        $stmt = $pdo->query("SELECT COUNT(*) as total_classes FROM classes");
+        $total_classes = $stmt->fetch(PDO::FETCH_ASSOC)['total_classes'];
+
+        $nav_badges = [
+            'students' => $total_students > 0 ? $total_students : '',
+            'data_quality' => $flagged_students > 0 ? $flagged_students : '',
+            'classes' => $total_classes > 0 ? $total_classes : ''
+        ];
+
+        cache_set($nav_badges_cache_key, $nav_badges, 300);
+    } catch (Exception $e) {
+        $nav_badges = [
+            'students' => '',
+            'data_quality' => '',
+            'classes' => ''
+        ];
+    }
+}
+
+// Define navigation items with cached badges
 $nav_items = [
     'dashboard' => [
         'title' => 'Dashboard',
@@ -19,7 +53,7 @@ $nav_items = [
         'title' => 'Students',
         'icon' => 'fa-users',
         'url' => 'students.php',
-        'badge' => ''
+        'badge' => $nav_badges['students']
     ],
     'allocation' => [
         'title' => 'Allocation',
@@ -31,7 +65,7 @@ $nav_items = [
         'title' => 'Data Quality',
         'icon' => 'fa-clipboard-check',
         'url' => 'data_quality.php',
-        'badge' => ''
+        'badge' => $nav_badges['data_quality']
     ],
     'results' => [
         'title' => 'Results',
@@ -43,7 +77,7 @@ $nav_items = [
         'title' => 'Classes',
         'icon' => 'fa-chalkboard',
         'url' => 'classes.php',
-        'badge' => '',
+        'badge' => $nav_badges['classes'],
         'submenu' => [
             'class_list' => [
                 'title' => 'Class List',
@@ -155,11 +189,14 @@ function renderAdminLayout($title = 'Admin Dashboard', $content = '', $page_scri
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($title) ?> - Music School Admin</title>
-    
-    <!-- Tailwind CSS - Preconnect for faster loading -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title><?= htmlspecialchars($title) ?> - Finot Selam Admin</title>
+
+    <!-- Local Tailwind CSS (built with npm) -->
+    <link rel="stylesheet" href="assets/app.min.css">
+
+    <!-- Optimized JavaScript -->
+    <script src="assets/app.min.js" defer></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -219,6 +256,13 @@ function renderAdminLayout($title = 'Admin Dashboard', $content = '', $page_scri
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Finot">
+    
     <!-- DNS Prefetch for common resources -->
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
@@ -264,11 +308,15 @@ function renderAdminLayout($title = 'Admin Dashboard', $content = '', $page_scri
         }
         
         .sidebar-collapsed .sidebar-text {
-            display: none;
+            display: none !important;
         }
         
         .sidebar-collapsed .nav-icon {
             margin: 0 auto;
+        }
+        
+        .sidebar-collapsed .nav-item {
+            justify-content: center !important;
         }
         
         /* Enhanced mobile touch targets */
@@ -375,10 +423,11 @@ function renderAdminLayout($title = 'Admin Dashboard', $content = '', $page_scri
         <!-- Enhanced Sidebar with Advanced Responsive Behavior -->
         <div class="sidebar bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 ease-in-out"
              :class="{
-                 'fixed inset-y-0 left-0 z-40 w-48 transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0': true,
+                 'fixed inset-y-0 left-0 z-40 w-64 transform -translate-x-full lg:translate-x-0 lg:static lg:inset-0': true,
                  'translate-x-0': sidebarOpen && isMobile,
-                 'w-14': sidebarCollapsed && !isMobile,
-                 'w-48': !sidebarCollapsed || isMobile
+                 'lg:w-16': sidebarCollapsed && !isMobile,
+                 'w-64': !sidebarCollapsed || isMobile,
+                 'sidebar-collapsed': sidebarCollapsed && !isMobile
              }"
              x-show="sidebarOpen || !isMobile"
              x-transition:enter="transition ease-in-out duration-300 transform"
@@ -389,41 +438,43 @@ function renderAdminLayout($title = 'Admin Dashboard', $content = '', $page_scri
              x-transition:leave-end="-translate-x-full">
          
         <!-- Enhanced Logo Section -->
-        <div class="flex items-center justify-between h-12 px-2 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-gray-700 dark:to-gray-800">
-            <div class="flex items-center space-x-1.5" :class="sidebarCollapsed && !isMobile ? 'justify-center' : ''">
-                <div class="w-6 h-6 bg-gradient-to-br from-primary-500 to-primary-600 rounded-md flex items-center justify-center shadow-lg hover-lift">
+        <div class="flex items-center h-12 px-2 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-gray-700 dark:to-gray-800">
+            <div class="flex items-center" :class="sidebarCollapsed && !isMobile ? 'justify-center w-full' : 'justify-start'">
+                <div class="w-6 h-6 bg-gradient-to-br from-primary-500 to-primary-600 rounded-md flex items-center justify-center shadow-lg hover-lift flex-shrink-0">
                     <i class="fas fa-graduation-cap text-white text-xs"></i>
                 </div>
-                <span class="sidebar-text text-md font-bold text-gray-900 dark:text-white" x-show="!sidebarCollapsed || isMobile">Admin</span>
+                <span class="sidebar-text text-md font-bold text-gray-900 dark:text-white ml-2" x-show="!sidebarCollapsed || isMobile">Admin</span>
             </div>
-            <!-- Mobile Close Button -->
-            <button @click="sidebarOpen = false" 
-                    class="lg:hidden p-0.5 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target">
-                <i class="fas fa-times text-xs"></i>
-            </button>
-            <!-- Desktop Collapse Button -->
-            <button @click="toggleSidebar()" 
-                    class="hidden lg:block p-0.5 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target"
+            
+            <!-- Desktop: Chevron button to collapse/expand sidebar -->
+            <button x-show="!isMobile" @click="toggleSidebar()" 
+                    class="flex items-center justify-center w-6 h-6 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target"
+                    :class="sidebarCollapsed ? 'mx-auto' : 'ml-auto'"
                     data-tooltip="Toggle Sidebar">
-                <i class="fas fa-chevron-left transition-transform duration-200 text-xs" :class="sidebarCollapsed ? 'rotate-180' : ''"></i>
+                <i class="fas transition-transform duration-200 text-xs" :class="sidebarCollapsed ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+            </button>
+            
+            <!-- Mobile: X button to close sidebar -->
+            <button x-show="isMobile" @click="sidebarOpen = false"
+                    class="flex items-center justify-center w-6 h-6 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target ml-auto">
+                <i class="fas fa-times text-xs"></i>
             </button>
         </div>
 
         <!-- Enhanced Navigation -->
-        <nav class="flex-1 px-2 py-2 space-y-1.5 overflow-y-auto custom-scrollbar">
+        <nav class="flex-1 px-2 py-2 space-y-1 overflow-y-auto custom-scrollbar">
             <?php foreach ($nav_items as $key => $item): ?>
             <a href="<?= $item['url'] ?>" 
-               class="group flex items-center gap-2.5 md:gap-3 justify-start text-left w-full px-2 py-2 md:px-2.5 md:py-2.5 text-xs leading-snug font-medium rounded-md transition-all duration-200 touch-target hover-lift focus:outline-none focus:ring-2 focus:ring-primary-400/50
+               class="group flex items-center gap-3 justify-start text-left w-full px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200 touch-target hover-lift focus:outline-none focus:ring-2 focus:ring-primary-400/50
                       <?= $active_page === $key ? 
                           'bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/50 dark:to-primary-800/50 text-primary-700 dark:text-primary-300 border-r-3 border-primary-500 shadow-sm' : 
                           'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white' ?>"
                data-tooltip="<?= $item['title'] ?>">
-                <i class="nav-icon fas <?= $item['icon'] ?> flex-shrink-0 w-4 h-4 transition-colors duration-200
+                <i class="nav-icon fas <?= $item['icon'] ?> flex-shrink-0 w-5 h-5 text-center transition-colors duration-200
                          <?= $active_page === $key ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300' ?>"></i>
-                <span class="sidebar-text truncate" x-show="!sidebarCollapsed || isMobile"><?= $item['title'] ?></span>
+                <span class="sidebar-text flex-1 truncate"><?= $item['title'] ?></span>
                 <?php if ($item['badge']): ?>
-                <span class="sidebar-text ml-auto bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 text-xs px-1.5 py-0.5 rounded-full" 
-                      x-show="!sidebarCollapsed || isMobile">
+                <span class="sidebar-text bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 text-xs px-2 py-0.5 rounded-full flex-shrink-0">
                     <?= $item['badge'] ?>
                 </span>
                 <?php endif; ?>
@@ -439,8 +490,8 @@ function renderAdminLayout($title = 'Admin Dashboard', $content = '', $page_scri
             <div class="flex items-center justify-between h-12 px-2 sm:px-3 lg:px-4">
                 <!-- Left side -->
                 <div class="flex items-center space-x-3">
-                    <button @click="toggleSidebar()" 
-                            class="p-1.5 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target lg:hidden"
+                    <button x-show="isMobile" @click="toggleSidebar()"
+                            class="p-1.5 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors touch-target"
                             data-tooltip="Open Menu">
                         <i class="fas fa-bars text-sm"></i>
                     </button>
@@ -878,6 +929,62 @@ function renderAdminLayout($title = 'Admin Dashboard', $content = '', $page_scri
     </script>
     
     <?= $page_script ?>
+    
+    <!-- Performance Optimization Scripts -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lazy load images using Intersection Observer
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            img.classList.remove('lazy');
+                            imageObserver.unobserve(img);
+                        }
+                    }
+                });
+            });
+            
+            document.querySelectorAll('img.lazy').forEach(function(img) {
+                imageObserver.observe(img);
+            });
+        } else {
+            // Fallback for older browsers
+            document.querySelectorAll('img.lazy').forEach(function(img) {
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+            });
+        }
+        
+        // Service Worker Registration for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registered successfully');
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+    });
+    
+    // Optimize DOM updates with requestAnimationFrame
+    function optimizedUpdate(callback) {
+        if ('requestAnimationFrame' in window) {
+            requestAnimationFrame(callback);
+        } else {
+            setTimeout(callback, 16);
+        }
+    }
+    </script>
 </body>
 </html>
     <?php

@@ -163,29 +163,39 @@ class EnhancedCache {
 // Initialize global cache instance
 $cache = new EnhancedCache();
 
-// Helper functions for easier usage
-function cache_get($key, $ttl = 300) {
-    global $cache;
-    return $cache->get($key, $ttl);
+// Helper functions for easier usage (with function_exists to prevent redeclaration)
+if (!function_exists('cache_get')) {
+    function cache_get($key, $ttl = 300) {
+        global $cache;
+        return $cache->get($key, $ttl);
+    }
 }
 
-function cache_set($key, $data) {
-    global $cache;
-    return $cache->set($key, $data);
+if (!function_exists('cache_set')) {
+    function cache_set($key, $data) {
+        global $cache;
+        return $cache->set($key, $data);
+    }
 }
 
-function cache_delete($key) {
-    global $cache;
-    return $cache->delete($key);
+if (!function_exists('cache_delete')) {
+    function cache_delete($key) {
+        global $cache;
+        return $cache->delete($key);
+    }
 }
 
-function cache_clear() {
-    global $cache;
-    return $cache->clear();
+if (!function_exists('cache_clear')) {
+    function cache_clear() {
+        global $cache;
+        return $cache->clear();
+    }
 }
 
-function cache_warmup($key, $callback, $ttl = 300) {
-    global $cache;
-    return $cache->warmUp($key, $callback, $ttl);
+if (!function_exists('cache_warmup')) {
+    function cache_warmup($key, $callback, $ttl = 300) {
+        global $cache;
+        return $cache->warmUp($key, $callback, $ttl);
+    }
 }
 ?>

@@ -4,11 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>የፍኖተ ሰላም ሰ/ት/ቤት ምዝገባ ፎርም</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <!-- Critical CSS (inline) -->
+    <style><?php include 'assets/css/dist/critical.min.css'; ?></style>
+
+    <!-- Preload optimized fonts -->
+    <link rel="preload" href="assets/fonts/optimized-fonts.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="assets/fonts/optimized-fonts.css"></noscript>
+
+    <!-- Async CSS loader -->
+    <script><?php include 'assets/js/dist/css-loader.js'; ?></script>
+
+    <!-- Optimized JavaScript libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethiopian-date/1.0.0/ethiopian-date.min.js"></script>
     <style>
         body {

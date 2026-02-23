@@ -14,6 +14,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     try {
         switch ($_POST['action']) {
+                case 'quick_add_students':
+                    $class_id = (int)$_POST['class_id'];
+                    $names = json_decode($_POST['names'] ?? '[]', true);
+                    if (empty($class_id) || empty($names) || !is_array($names)) {
+                        echo json_encode(['success' => false, 'message' => 'Class ID and names required']);
+                        break;
+                    }
+                    $pdo->beginTransaction();
+                    try {
+                        $created = 0;
+                        $enrolled = 0;
+                        $student_ids = [];
+                        // Set a default birth_date (e.g., '2000-01-01') for quick add
+                        $default_birth_date = '2000-01-01';
+                        $insertStudentStmt = $pdo->prepare("INSERT INTO students (full_name, birth_date, created_at) VALUES (?, ?, NOW())");
+                        $findStudentStmt = $pdo->prepare("SELECT id FROM students WHERE LOWER(TRIM(full_name)) = LOWER(TRIM(?)) LIMIT 1");
+                        $enrollStmt = $pdo->prepare("INSERT INTO class_enrollments (class_id, student_id, enrollment_date, status) VALUES (?, ?, CURDATE(), 'active') ON DUPLICATE KEY UPDATE status = 'active', enrollment_date = VALUES(enrollment_date)");
+                        foreach ($names as $name) {
+                            $name = trim($name);
+                            if ($name === '') continue;
+                            // Check if student exists
+                            $findStudentStmt->execute([$name]);
+                            $row = $findStudentStmt->fetch(PDO::FETCH_ASSOC);
+                            if ($row && !empty($row['id'])) {
+                                $student_id = (int)$row['id'];
+                            } else {
+                                $insertStudentStmt->execute([$name, $default_birth_date]);
+                                $student_id = (int)$pdo->lastInsertId();
+                                $created++;
+                            }
+                            // Enroll in class
+                            $enrollStmt->execute([$class_id, $student_id]);
+                            $enrolled++;
+                            $student_ids[] = $student_id;
+                        }
+                        $pdo->commit();
+                        echo json_encode(['success' => true, 'message' => "$created new students created, $enrolled enrolled in class.", 'student_ids' => $student_ids]);
+                    } catch (Exception $e) {
+                        $pdo->rollBack();
+                        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+                    }
+                    break;
             case 'get_classes':
                 $stmt = $pdo->query("
                     SELECT c.*, t.full_name as teacher_name,
@@ -249,7 +291,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     }
                 }
                 
-                // Assign students
+                                // Assign students
+                                // Quick Add Student Modal Trigger (UI)
+                                echo '<button type="button" class="compact-btn bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded ml-2" onclick="openQuickAddStudentModal(' . $class_id . ')"><i class="fas fa-user-plus mr-1"></i>Quick Add Student</button>';
+
+                                // Quick Add Student Modal (hidden by default)
+                                echo '<div id="quick-add-student-modal-' . $class_id . '" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">';
+                                echo '<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-full max-w-md">';
+                                echo '<div class="flex justify-between items-center mb-2">';
+                                echo '<h3 class="text-sm font-semibold text-gray-900 dark:text-white">Quick Add Student(s)</h3>';
+                                echo '<button onclick="closeQuickAddStudentModal(' . $class_id . ')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>';
+                                echo '</div>';
+                                echo '<form onsubmit="submitQuickAddStudent(event, ' . $class_id . ')">';
+                                echo '<label class="block text-xs text-gray-700 dark:text-gray-300 mb-1">Enter full name(s), one per line:</label>';
+                                echo '<textarea id="quick-add-names-' . $class_id . '" class="w-full border border-gray-300 dark:border-gray-600 rounded p-2 text-xs mb-2" rows="4" required></textarea>';
+                                echo '<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded">Add & Enroll</button>';
+                                echo '</form>';
+                                echo '</div></div>';
+
+                                // Quick Add Student Modal JS
+                                echo '<script>
+function openQuickAddStudentModal(classId) {
+    document.getElementById("quick-add-student-modal-" + classId).classList.remove("hidden");
+}
+function closeQuickAddStudentModal(classId) {
+    document.getElementById("quick-add-student-modal-" + classId).classList.add("hidden");
+}
+function submitQuickAddStudent(e, classId) {
+    e.preventDefault();
+    var names = document.getElementById("quick-add-names-" + classId).value.trim().split(/\n+/).filter(Boolean);
+    if (names.length === 0) return;
+    fetch("classes.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=quick_add_students&class_id=" + encodeURIComponent(classId) + "&names=" + encodeURIComponent(JSON.stringify(names))
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message || (data.success ? "Students added and enrolled!" : "Failed to add students."));
+        if (data.success) {
+            closeQuickAddStudentModal(classId);
+            location.reload();
+        }
+    });
+}
+</script>';
                 $pdo->beginTransaction();
                 try {
                     $assigned_count = 0;

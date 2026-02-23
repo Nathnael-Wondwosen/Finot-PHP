@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles from admin_layout.php */
+[x-cloak] { display: none !important; }
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.8);
+}
+
+/* Mobile-first responsive table */
+.mobile-table-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+@media (min-width: 768px) {
+    .mobile-table-row {
+        display: table-row;
+        padding: 0;
+        border-bottom: none;
+    }
+}
+
+/* Advanced sidebar responsive handling */
+.sidebar-collapsed {
+    width: 4rem !important;
+}
+
+.sidebar-collapsed .sidebar-text {
+    display: none;
+}
+
+.sidebar-collapsed .nav-icon {
+    margin: 0 auto;
+}
+
+/* Enhanced mobile touch targets */
+.touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Glassmorphism effect */
+.glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, transform, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Enhanced hover effects */
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile-first responsive design utilities */
+@media (max-width: 640px) {
+    .mobile-hide { display: none !important; }
+    .mobile-full { width: 100% !important; }
+    .mobile-text-center { text-align: center !important; }
+}
+
+/* Animations */
+@keyframes slideInFromLeft {
+    0% { transform: translateX(-100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-slide-in-left { animation: slideInFromLeft 0.3s ease-out; }
+.animate-slide-in-right { animation: slideInFromRight 0.3s ease-out; }
+.animate-bounce-in { animation: bounceIn 0.5s ease-out; }

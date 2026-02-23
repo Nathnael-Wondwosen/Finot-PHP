@@ -15,9 +15,12 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
         'current_page' => 1,
         'total_records' => 0,
         'table_id' => 'mobile-table',
-        'empty_message' => 'No data available'
+        'empty_message' => 'No data available',
+        'lazy_load' => false, // New option for lazy loading
+        'lazy_load_url' => '', // AJAX URL for lazy loading
+        'lazy_load_threshold' => 10 // Load more when 10 items from bottom
     ];
-    
+
     $options = array_merge($defaults, $options);
     
     ob_start();
@@ -223,7 +226,18 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
             <?php endforeach; ?>
             <?php endif; ?>
         </div>
-        
+
+        <!-- Lazy Loading Elements -->
+        <?php if ($options['lazy_load']): ?>
+        <div id="<?= $options['table_id'] ?>-loading" class="hidden p-4 text-center text-gray-500 dark:text-gray-400">
+            <div class="inline-flex items-center space-x-2">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span class="text-sm">Loading more...</span>
+            </div>
+        </div>
+        <div id="<?= $options['table_id'] ?>-lazy-trigger" class="h-4"></div>
+        <?php endif; ?>
+
         <!-- Pagination -->
         <?php if ($options['show_pagination'] && $options['total_records'] > $options['per_page']): ?>
         <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
@@ -282,9 +296,112 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
         const tableId = '<?= $options['table_id'] ?>';
         const savedView = localStorage.getItem('table-view-' + tableId);
         const defaultView = window.innerWidth >= 1024 ? 'table' : 'cards';
-        
+
         toggleTableView(tableId, savedView || defaultView);
+
+        <?php if ($options['lazy_load'] && !empty($options['lazy_load_url'])): ?>
+        // Initialize lazy loading
+        initializeLazyLoading(tableId, '<?= $options['lazy_load_url'] ?>', <?= $options['lazy_load_threshold'] ?>);
+        <?php endif; ?>
     });
+
+    // Lazy loading functionality
+    function initializeLazyLoading(tableId, url, threshold) {
+        const container = document.getElementById(tableId + '-container');
+        const loadingIndicator = document.getElementById(tableId + '-loading');
+        let isLoading = false;
+        let currentPage = 1;
+        let hasMoreData = true;
+
+        function loadMoreData() {
+            if (isLoading || !hasMoreData) return;
+
+            isLoading = true;
+            if (loadingIndicator) loadingIndicator.style.display = 'block';
+
+            currentPage++;
+
+            fetch(url + '?page=' + currentPage + '&ajax=1')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data && data.data.length > 0) {
+                        appendDataToTable(tableId, data.data);
+                    } else {
+                        hasMoreData = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Lazy loading error:', error);
+                    hasMoreData = false;
+                })
+                .finally(() => {
+                    isLoading = false;
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
+                });
+        }
+
+        function appendDataToTable(tableId, newData) {
+            const tbody = document.querySelector('#' + tableId + ' tbody');
+            const cardContainer = document.querySelector('#' + tableId + '-cards');
+
+            newData.forEach(item => {
+                // Add to table view
+                if (tbody) {
+                    const row = createTableRow(item);
+                    tbody.appendChild(row);
+                }
+
+                // Add to card view
+                if (cardContainer) {
+                    const card = createCard(item);
+                    cardContainer.appendChild(card);
+                }
+            });
+        }
+
+        // Intersection Observer for lazy loading
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    loadMoreData();
+                }
+            });
+        }, {
+            root: container,
+            threshold: 0.1
+        });
+
+        // Observe the loading trigger element
+        const triggerElement = document.getElementById(tableId + '-lazy-trigger');
+        if (triggerElement) {
+            observer.observe(triggerElement);
+        }
+
+        // Also observe the last few items
+        function observeLastItems() {
+            const items = container.querySelectorAll('[data-item-id]');
+            const lastItems = Array.from(items).slice(-threshold);
+
+            lastItems.forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        observeLastItems();
+
+        // Re-observe when new items are added
+        const observerCallback = function(mutationsList) {
+            for (let mutation of mutationsList) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    observeLastItems();
+                }
+            }
+        };
+
+        const observerConfig = { childList: true, subtree: true };
+        const mutationObserver = new MutationObserver(observerCallback);
+        mutationObserver.observe(container, observerConfig);
+    }
     </script>
     
     <?php

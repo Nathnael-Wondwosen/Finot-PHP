@@ -409,25 +409,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 // Main page logic
-// Implement proper pagination
+// Implement proper pagination with optimized caching
 if ($perfMonitor) $perfMonitor->checkpoint('start_processing');
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-// Determine Show All and page size BEFORE initial fetch
-$show_all_init = false;
-if (isset($_GET['show_all'])) {
-    $val = strtolower((string)$_GET['show_all']);
-    $show_all_init = ($val === '' || $val === 'true' || $val === '1' || $val === 'yes' || $val === 'on');
-}
 
-// Optional per_page param for paged mode
-$allowed_page_sizes = [10, 25, 50, 100];
-$per_page_param = (int)($_GET['per_page'] ?? 25);
-if (!in_array($per_page_param, $allowed_page_sizes, true)) { $per_page_param = 25; }
+// Cache key for main data
+$cacheKey = 'students_main_data_' . $admin_id . '_' . time();
+$mainData = cache_get($cacheKey, 300); // 5 minutes cache
 
-if ($show_all_init) {
-    // Fetch all rows for initial dataset
-    $page = 1;
-    $total_all = (int)get_total_students_count($pdo);
+if ($mainData === null) {
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    // Determine Show All and page size BEFORE initial fetch
+    $show_all_init = false;
+    if (isset($_GET['show_all'])) {
+        $val = strtolower((string)$_GET['show_all']);
+        $show_all_init = ($val === '' || $val === 'true' || $val === '1' || $val === 'yes' || $val === 'on');
+    }
+
+    // Optional per_page param for paged mode
+    $allowed_page_sizes = [10, 25, 50, 100];
+    $per_page_param = (int)($_GET['per_page'] ?? 25);
+    if (!in_array($per_page_param, $allowed_page_sizes, true)) { $per_page_param = 25; }
+
+    if ($show_all_init) {
+        // Fetch all rows for initial dataset
+        $page = 1;
+        $total_all = (int)get_total_students_count($pdo);
     $per_page = $total_all;
 } else {
     $per_page = $per_page_param; // Paged mode
@@ -1812,4 +1818,5 @@ function printStudentDetails(){
 
 // Render the complete page using the admin layout
 echo renderAdminLayout($title . ' - Student Management System', $content, $page_script);
+}
 ?>

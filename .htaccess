@@ -93,6 +93,17 @@ Options -Indexes
 # Enable keep-alive
 <IfModule mod_headers.c>
     Header set Connection keep-alive
+    
+    # HTTP/2 Preload Hints - Preload critical resources
+    # Add to HTML: <link rel="preload" href="/assets/app.min.js" as="script">
+    
+    # Early Hints for faster resource loading (HTTP/2)
+    <IfModule mod_headers.c>
+        Header set Link "</assets/app.min.js>; rel=preload, </assets/app.min.css>; rel=preload"
+    </IfModule>
+    
+    # Reduce DNS lookups
+    Header set X-DNS-Prefetch-Control "on"
 </IfModule>
 
 RewriteCond %{HTTP_HOST} ^learn\.finoteselamss\.org$ [OR]

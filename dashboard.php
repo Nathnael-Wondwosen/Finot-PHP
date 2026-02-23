@@ -3,7 +3,7 @@ session_start();
 require 'config.php';
 require 'includes/admin_layout.php';
 require 'includes/mobile_table.php';
-require 'includes/cache_manager.php';
+require 'includes/students_helpers.php';
 requireAdminLogin();
 
 // Enable output buffering for performance
@@ -72,9 +72,9 @@ if ($pref_row && !empty($pref_row['column_list'])) {
 
 // Fetch students with caching for better performance
 $students = cache_remember('dashboard_students_list', function() use ($pdo) {
-    $sql = "SELECT s.id, s.photo_path, s.full_name, s.christian_name, s.gender, s.birth_date, 
+    $sql = "SELECT s.id, s.photo_path, s.full_name, s.christian_name, s.gender, s.birth_date,
             s.current_grade, s.phone_number, s.created_at,
-            f.full_name AS father_full_name, f.phone_number AS father_phone, 
+            f.full_name AS father_full_name, f.phone_number AS father_phone,
             m.full_name AS mother_full_name, m.phone_number AS mother_phone,
             g.full_name AS guardian_full_name, g.phone_number AS guardian_phone
         FROM students s
@@ -86,28 +86,84 @@ $students = cache_remember('dashboard_students_list', function() use ($pdo) {
     return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 }, CACHE_TTL_DASHBOARD, 'dashboard');
 
-// Calculate advanced statistics
-$total_students = count($students);
-$male_students = count(array_filter($students, fn($s) => $s['gender'] === 'male'));
-$female_students = count(array_filter($students, fn($s) => $s['gender'] === 'female'));
-$new_this_month = count(array_filter($students, fn($s) => strtotime($s['created_at']) > strtotime('-30 days')));
-$new_this_week = count(array_filter($students, fn($s) => strtotime($s['created_at']) > strtotime('-7 days')));
-$youth_students = count(array_filter($students, function($s) {
-    if (empty($s['birth_date'])) return false;
-    $parts = explode('-', $s['birth_date']);
-    if (count($parts) !== 3) return false;
-    $age = 2024 - (int)$parts[0]; // Rough Ethiopian to Gregorian conversion
-    return $age >= 18;
-}));
-$under_18_students = $total_students - $youth_students;
+// Calculate advanced statistics with optimized database queries
+$stats = cache_remember('dashboard_stats', function() use ($pdo) {
+    $stats = [];
 
-// Grade distribution
-$grade_distribution = [];
-foreach ($students as $student) {
-    $grade = $student['current_grade'] ?: 'Unknown';
-    $grade_distribution[$grade] = ($grade_distribution[$grade] ?? 0) + 1;
-}
-arsort($grade_distribution);
+    // Get total counts with single query
+    $stmt = $pdo->query("
+        SELECT
+            COUNT(*) as total_students,
+            SUM(CASE WHEN gender = 'male' THEN 1 ELSE 0 END) as male_students,
+            SUM(CASE WHEN gender = 'female' THEN 1 ELSE 0 END) as female_students,
+            SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as new_this_month,
+            SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as new_this_week
+        FROM students
+    ");
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $stats['total_students'] = (int)$result['total_students'];
+    $stats['male_students'] = (int)$result['male_students'];
+    $stats['female_students'] = (int)$result['female_students'];
+    $stats['new_this_month'] = (int)$result['new_this_month'];
+    $stats['new_this_week'] = (int)$result['new_this_week'];
+
+    // Calculate youth vs under 18 (optimized)
+    $stmt = $pdo->query("
+        SELECT
+            SUM(CASE WHEN YEAR(birth_date) <= 2006 THEN 1 ELSE 0 END) as youth_students
+        FROM students
+        WHERE birth_date IS NOT NULL AND birth_date != ''
+    ");
+    $youthResult = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stats['youth_students'] = (int)$youthResult['youth_students'];
+    $stats['under_18_students'] = $stats['total_students'] - $stats['youth_students'];
+
+    // Get grade distribution
+    $stmt = $pdo->query("
+        SELECT current_grade, COUNT(*) as count
+        FROM students
+        WHERE current_grade IS NOT NULL AND current_grade != ''
+        GROUP BY current_grade
+        ORDER BY count DESC
+    ");
+    $stats['grade_distribution'] = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'count', 'current_grade');
+
+    return $stats;
+}, CACHE_TTL_DASHBOARD, 'dashboard');
+
+// Extract statistics for backward compatibility
+$total_students = $stats['total_students'];
+$male_students = $stats['male_students'];
+$female_students = $stats['female_students'];
+$new_this_month = $stats['new_this_month'];
+$new_this_week = $stats['new_this_week'];
+$youth_students = $stats['youth_students'];
+$under_18_students = $stats['under_18_students'];
+$grade_distribution = $stats['grade_distribution'];
+
+// Legacy calculation (keeping for now but optimized above)
+// $total_students = count($students);
+// $male_students = count(array_filter($students, fn($s) => $s['gender'] === 'male'));
+// $female_students = count(array_filter($students, fn($s) => $s['gender'] === 'female'));
+// $new_this_month = count(array_filter($students, fn($s) => strtotime($s['created_at']) > strtotime('-30 days')));
+// $new_this_week = count(array_filter($students, fn($s) => strtotime($s['created_at']) > strtotime('-7 days')));
+// $youth_students = count(array_filter($students, function($s) {
+//     if (empty($s['birth_date'])) return false;
+//     $parts = explode('-', $s['birth_date']);
+//     if (count($parts) !== 3) return false;
+//     $age = 2024 - (int)$parts[0]; // Rough Ethiopian to Gregorian conversion
+//     return $age >= 18;
+// }));
+// $under_18_students = $total_students - $youth_students;
+
+// Grade distribution (optimized above)
+// $grade_distribution = [];
+// foreach ($students as $student) {
+//     $grade = $student['current_grade'] ?: 'Unknown';
+//     $grade_distribution[$grade] = ($grade_distribution[$grade] ?? 0) + 1;
+// }
+// arsort($grade_distribution);
 
 // Recent registrations (last 5 most recent)
 $recent_students = array_slice($students, 0, 5);

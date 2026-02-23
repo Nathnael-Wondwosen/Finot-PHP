@@ -876,6 +876,36 @@ function closeClassDetailsModal() {
     document.getElementById("class-details-modal").classList.add("hidden");
 }
 
+// Quick Add Student Modal functions (must be global for dynamic modals)
+window.openQuickAddStudentModal = function(classId) {
+    var modal = document.getElementById("quick-add-student-modal-" + classId);
+    if (modal) modal.classList.remove("hidden");
+};
+window.closeQuickAddStudentModal = function(classId) {
+    var modal = document.getElementById("quick-add-student-modal-" + classId);
+    if (modal) modal.classList.add("hidden");
+};
+window.submitQuickAddStudent = function(e, classId) {
+    e.preventDefault();
+    var textarea = document.getElementById("quick-add-names-" + classId);
+    if (!textarea) return;
+    var names = textarea.value.trim().split(/\n+/).filter(Boolean);
+    if (names.length === 0) return;
+    fetch("classes.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=quick_add_students&class_id=" + encodeURIComponent(classId) + "&names=" + encodeURIComponent(JSON.stringify(names))
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message || (data.success ? "Students added and enrolled!" : "Failed to add students."));
+        if (data.success) {
+            window.closeQuickAddStudentModal(classId);
+            location.reload();
+        }
+    });
+};
+
 // Open assign students modal
 function openAssignStudentsModal(classId) {
     const modal = document.createElement("div");
@@ -931,9 +961,12 @@ function openAssignStudentsModal(classId) {
                         <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Enter number of students to automatically select</p>
                     </div>
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Selected Students</label>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 mb-0">Selected Students</label>
                         <div class="px-2.5 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 rounded-md">
                             <span id="selected-count" class="font-medium">0</span> students selected
+                        </div>
+                        <div class="flex justify-end mt-2">
+                            <button type="button" class="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded flex items-center" onclick="openQuickAddStudentModal(${classId})"><i class='fas fa-user-plus mr-1'></i>Quick Add</button>
                         </div>
                     </div>
                 </div>
@@ -977,6 +1010,27 @@ function openAssignStudentsModal(classId) {
         </div>
     `;
     document.body.appendChild(modal);
+
+    // Inject Quick Add Student modal for this class if not already present
+    if (!document.getElementById(`quick-add-student-modal-${classId}`)) {
+        const quickAddModal = document.createElement('div');
+        quickAddModal.id = `quick-add-student-modal-${classId}`;
+        quickAddModal.className = 'hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+        quickAddModal.innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-full max-w-md">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Quick Add Student(s)</h3>
+                    <button onclick="window.closeQuickAddStudentModal(${classId})" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                </div>
+                <form onsubmit="window.submitQuickAddStudent(event, ${classId})">
+                    <label class="block text-xs text-gray-700 dark:text-gray-300 mb-1">Enter full name(s), one per line:</label>
+                    <textarea id="quick-add-names-${classId}" class="w-full border border-gray-300 dark:border-gray-600 rounded p-2 text-xs mb-2" rows="4" required></textarea>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded">Add & Enroll</button>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(quickAddModal);
+    }
     
     // Load students
     loadAvailableStudents(classId);

@@ -10,8 +10,17 @@ if (!isset($_COOKIE['seen_welcome']) && empty($_GET['skip_welcome'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>የፍኖተ ሰላም ሰ/ት/ቤት - ምዝገባ ተጠናቅቋል</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Critical CSS (inline) -->
+    <style><?php include 'assets/css/dist/critical.min.css'; ?></style>
+
+    <!-- Preload optimized fonts -->
+    <link rel="preload" href="assets/fonts/optimized-fonts.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="assets/fonts/optimized-fonts.css"></noscript>
+
+    <!-- Async CSS loader -->
+    <script><?php include 'assets/js/dist/css-loader.js'; ?></script>
+
     <style>
         body {
             font-family: 'Noto Sans Ethiopic', sans-serif;
