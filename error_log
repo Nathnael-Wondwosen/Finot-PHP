@@ -1,0 +1,1687 @@
+[08-Oct-2025 12:08:17 UTC] === process_youth.php STARTED === 2025-10-08 12:08:17
+[08-Oct-2025 12:08:17 UTC] Request method: POST
+[08-Oct-2025 12:08:17 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => Ephrem Tadesse Derseh
+    [christian_name] => Seife Gebrel
+    [gender] => male
+    [birth_year_et] => 1990
+    [birth_month_et] => 9
+    [birth_day_et] => 19
+    [current_grade] => 11th
+    [school_year_start] => 2008
+    [education_level] => 10
+    [field_of_study] => Cinimatography
+    [phone_number] => 0939986025
+    [has_spiritual_father] => own
+    [spiritual_father_name] => 
+    [spiritual_father_phone] => 
+    [spiritual_father_church] => 
+    [sub_city] => Lemi kura
+    [district] => 09
+    [specific_area] => Woji
+    [house_number] => _
+    [emergency_name] => Mulgeta Bekele
+    [emergency_phone] => 0927436089
+    [emergency_alt_phone] => 0982003980
+    [emergency_address] => Tulu Dimtu
+    [special_interests] => Art, Song Instrument
+    [physical_disability] => No
+    [transferred_from_other_school] => No
+    [came_from_other_religion] => No
+)
+
+[08-Oct-2025 12:08:17 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000063975.jpg
+            [full_path] => 1000063975.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpkxIl9u
+            [error] => 0
+            [size] => 50931
+        )
+
+)
+
+[08-Oct-2025 12:08:17 UTC] Is AJAX request: NO
+[08-Oct-2025 12:08:17 UTC] Session ID: vv1tooj3j1i5m8hrpquudgfqnn
+[08-Oct-2025 12:08:17 UTC] Admin logged in: NO
+[08-Oct-2025 12:08:17 UTC] Admin login check passed
+[08-Oct-2025 12:08:17 UTC] Form submission detected
+[08-Oct-2025 12:08:17 UTC] Processing POST request
+[08-Oct-2025 12:08:17 UTC] POST[form_submitted]: 1
+[08-Oct-2025 12:08:17 UTC] POST[full_name]: Ephrem Tadesse Derseh
+[08-Oct-2025 12:08:17 UTC] POST[christian_name]: Seife Gebrel
+[08-Oct-2025 12:08:17 UTC] POST[gender]: male
+[08-Oct-2025 12:08:17 UTC] POST[birth_year_et]: 1990
+[08-Oct-2025 12:08:17 UTC] POST[birth_month_et]: 9
+[08-Oct-2025 12:08:17 UTC] POST[birth_day_et]: 19
+[08-Oct-2025 12:08:17 UTC] POST[current_grade]: 11th
+[08-Oct-2025 12:08:17 UTC] POST[school_year_start]: 2008
+[08-Oct-2025 12:08:17 UTC] POST[education_level]: 10
+[08-Oct-2025 12:08:17 UTC] POST[field_of_study]: Cinimatography
+[08-Oct-2025 12:08:17 UTC] POST[phone_number]: 0939986025
+[08-Oct-2025 12:08:17 UTC] POST[has_spiritual_father]: own
+[08-Oct-2025 12:08:17 UTC] POST[spiritual_father_name]: 
+[08-Oct-2025 12:08:17 UTC] POST[spiritual_father_phone]: 
+[08-Oct-2025 12:08:17 UTC] POST[spiritual_father_church]: 
+[08-Oct-2025 12:08:17 UTC] POST[sub_city]: Lemi kura
+[08-Oct-2025 12:08:17 UTC] POST[district]: 09
+[08-Oct-2025 12:08:17 UTC] POST[specific_area]: Woji
+[08-Oct-2025 12:08:17 UTC] POST[house_number]: _
+[08-Oct-2025 12:08:17 UTC] POST[emergency_name]: Mulgeta Bekele
+[08-Oct-2025 12:08:17 UTC] POST[emergency_phone]: 0927436089
+[08-Oct-2025 12:08:17 UTC] POST[emergency_alt_phone]: 0982003980
+[08-Oct-2025 12:08:17 UTC] POST[emergency_address]: Tulu Dimtu
+[08-Oct-2025 12:08:17 UTC] POST[special_interests]: Art, Song Instrument
+[08-Oct-2025 12:08:17 UTC] POST[physical_disability]: No
+[08-Oct-2025 12:08:17 UTC] POST[transferred_from_other_school]: No
+[08-Oct-2025 12:08:17 UTC] POST[came_from_other_religion]: No
+[08-Oct-2025 12:08:17 UTC] Name: Ephrem Tadesse Derseh, Christian name: Seife Gebrel, Gender: male, DOB: 1990-9-19
+[08-Oct-2025 12:08:17 UTC] Phone: 0939986025
+[08-Oct-2025 12:08:17 UTC] Emergency phone: 0927436089, Alt phone: 0982003980
+[08-Oct-2025 12:08:17 UTC] Has spiritual father: own
+[08-Oct-2025 12:08:17 UTC] Emergency name: Mulgeta Bekele, Address: Tulu Dimtu
+[08-Oct-2025 12:08:17 UTC] special_interests: Art, Song Instrument
+[08-Oct-2025 12:08:17 UTC] physical_disability: No
+[08-Oct-2025 12:08:17 UTC] transferred_from_other_school: No
+[08-Oct-2025 12:08:17 UTC] came_from_other_religion: No
+[08-Oct-2025 12:08:17 UTC] Checking photo upload
+[08-Oct-2025 12:08:17 UTC] Photo details - name: 1000063975.jpg, type: image/jpeg, size: 50931, tmp_name: /tmp/phpkxIl9u
+[08-Oct-2025 12:08:17 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[08-Oct-2025 12:08:17 UTC] Upload directory exists: YES
+[08-Oct-2025 12:08:17 UTC] Upload directory writable: YES
+[08-Oct-2025 12:08:17 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e65431558d0.jpg
+[08-Oct-2025 12:08:17 UTC] Photo saved successfully: uploads/68e65431558d0.jpg
+[08-Oct-2025 12:08:17 UTC] Birth date ET: 1990-09-19
+[08-Oct-2025 12:08:17 UTC] Age: 28
+[08-Oct-2025 12:08:17 UTC] Checking for duplicates
+[08-Oct-2025 12:08:17 UTC] Inserting student record
+[08-Oct-2025 12:08:17 UTC] Insert result: SUCCESS
+[08-Oct-2025 12:08:17 UTC] Student ID: 1164
+[08-Oct-2025 12:08:17 UTC] Update result: SUCCESS
+[08-Oct-2025 12:08:17 UTC] Registration successful, redirecting to success page
+[08-Oct-2025 14:01:19 UTC] === process_youth.php STARTED === 2025-10-08 14:01:19
+[08-Oct-2025 14:01:20 UTC] Request method: POST
+[08-Oct-2025 14:01:20 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => አፎሚያ ጥላሁን
+    [christian_name] => ወለተ ፂሆን
+    [gender] => female
+    [birth_year_et] => 2000
+    [birth_month_et] => 3
+    [birth_day_et] => 21
+    [current_grade] => 7th
+    [school_year_start] => 2010
+    [education_level] => Grade 11
+    [field_of_study] => ተማሪ
+    [phone_number] => 0985681393
+    [has_spiritual_father] => own
+    [spiritual_father_name] => አባ አሻግሬ
+    [spiritual_father_phone] => 0914077288
+    [spiritual_father_church] => ሰሚት መድኃኔአለም
+    [sub_city] => ለሚ ኩራ
+    [district] => 
+    [specific_area] => ዋሽንግተን
+    [house_number] => 
+    [emergency_name] => ሔርሜላ ጥላሁን
+    [emergency_phone] => 0915995783
+    [emergency_alt_phone] => 0913379957
+    [emergency_address] => ሰሚት
+    [special_interests] => መዝሙር
+    [physical_disability] => የለም
+    [transferred_from_other_school] => የለም
+    [came_from_other_religion] => የለም
+)
+
+[08-Oct-2025 14:01:20 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => captured_photo.jpg
+            [full_path] => captured_photo.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpOoFOvl
+            [error] => 0
+            [size] => 49926
+        )
+
+)
+
+[08-Oct-2025 14:01:20 UTC] Is AJAX request: NO
+[08-Oct-2025 14:01:20 UTC] Session ID: b0j8h59dhgqc7fc83vgvdmp7sl
+[08-Oct-2025 14:01:20 UTC] Admin logged in: NO
+[08-Oct-2025 14:01:20 UTC] Admin login check passed
+[08-Oct-2025 14:01:20 UTC] Form submission detected
+[08-Oct-2025 14:01:20 UTC] Processing POST request
+[08-Oct-2025 14:01:20 UTC] POST[form_submitted]: 1
+[08-Oct-2025 14:01:20 UTC] POST[full_name]: አፎሚያ ጥላሁን
+[08-Oct-2025 14:01:20 UTC] POST[christian_name]: ወለተ ፂሆን
+[08-Oct-2025 14:01:20 UTC] POST[gender]: female
+[08-Oct-2025 14:01:20 UTC] POST[birth_year_et]: 2000
+[08-Oct-2025 14:01:20 UTC] POST[birth_month_et]: 3
+[08-Oct-2025 14:01:20 UTC] POST[birth_day_et]: 21
+[08-Oct-2025 14:01:20 UTC] POST[current_grade]: 7th
+[08-Oct-2025 14:01:20 UTC] POST[school_year_start]: 2010
+[08-Oct-2025 14:01:20 UTC] POST[education_level]: Grade 11
+[08-Oct-2025 14:01:20 UTC] POST[field_of_study]: ተማሪ
+[08-Oct-2025 14:01:20 UTC] POST[phone_number]: 0985681393
+[08-Oct-2025 14:01:20 UTC] POST[has_spiritual_father]: own
+[08-Oct-2025 14:01:20 UTC] POST[spiritual_father_name]: አባ አሻግሬ
+[08-Oct-2025 14:01:20 UTC] POST[spiritual_father_phone]: 0914077288
+[08-Oct-2025 14:01:20 UTC] POST[spiritual_father_church]: ሰሚት መድኃኔአለም
+[08-Oct-2025 14:01:20 UTC] POST[sub_city]: ለሚ ኩራ
+[08-Oct-2025 14:01:20 UTC] POST[district]: 
+[08-Oct-2025 14:01:20 UTC] POST[specific_area]: ዋሽንግተን
+[08-Oct-2025 14:01:20 UTC] POST[house_number]: 
+[08-Oct-2025 14:01:20 UTC] POST[emergency_name]: ሔርሜላ ጥላሁን
+[08-Oct-2025 14:01:20 UTC] POST[emergency_phone]: 0915995783
+[08-Oct-2025 14:01:20 UTC] POST[emergency_alt_phone]: 0913379957
+[08-Oct-2025 14:01:20 UTC] POST[emergency_address]: ሰሚት
+[08-Oct-2025 14:01:20 UTC] POST[special_interests]: መዝሙር
+[08-Oct-2025 14:01:20 UTC] POST[physical_disability]: የለም
+[08-Oct-2025 14:01:20 UTC] POST[transferred_from_other_school]: የለም
+[08-Oct-2025 14:01:20 UTC] POST[came_from_other_religion]: የለም
+[08-Oct-2025 14:01:20 UTC] Name: አፎሚያ ጥላሁን, Christian name: ወለተ ፂሆን, Gender: female, DOB: 2000-3-21
+[08-Oct-2025 14:01:20 UTC] Phone: 0985681393
+[08-Oct-2025 14:01:20 UTC] Emergency phone: 0915995783, Alt phone: 0913379957
+[08-Oct-2025 14:01:20 UTC] Has spiritual father: own
+[08-Oct-2025 14:01:20 UTC] Emergency name: ሔርሜላ ጥላሁን, Address: ሰሚት
+[08-Oct-2025 14:01:20 UTC] special_interests: መዝሙር
+[08-Oct-2025 14:01:20 UTC] physical_disability: የለም
+[08-Oct-2025 14:01:20 UTC] transferred_from_other_school: የለም
+[08-Oct-2025 14:01:20 UTC] came_from_other_religion: የለም
+[08-Oct-2025 14:01:20 UTC] Checking photo upload
+[08-Oct-2025 14:01:20 UTC] Photo details - name: captured_photo.jpg, type: image/jpeg, size: 49926, tmp_name: /tmp/phpOoFOvl
+[08-Oct-2025 14:01:20 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[08-Oct-2025 14:01:20 UTC] Upload directory exists: YES
+[08-Oct-2025 14:01:20 UTC] Upload directory writable: YES
+[08-Oct-2025 14:01:20 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e66eb003b63.jpg
+[08-Oct-2025 14:01:20 UTC] Photo saved successfully: uploads/68e66eb003b63.jpg
+[08-Oct-2025 14:01:20 UTC] Birth date ET: 2000-03-21
+[08-Oct-2025 14:01:20 UTC] Age: 18
+[08-Oct-2025 14:01:20 UTC] Checking for duplicates
+[08-Oct-2025 14:01:20 UTC] Inserting student record
+[08-Oct-2025 14:01:20 UTC] Insert result: SUCCESS
+[08-Oct-2025 14:01:20 UTC] Student ID: 1165
+[08-Oct-2025 14:01:20 UTC] Update result: SUCCESS
+[08-Oct-2025 14:01:20 UTC] Registration successful, redirecting to success page
+[08-Oct-2025 15:20:54 UTC] === process_youth.php STARTED === 2025-10-08 15:20:54
+[08-Oct-2025 15:20:54 UTC] Request method: POST
+[08-Oct-2025 15:20:54 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ዲ/ን ሱራፌል ተሾመ ይፍሩ
+    [christian_name] => ገ/ኪሮስ
+    [gender] => male
+    [birth_year_et] => 1991
+    [birth_month_et] => 6
+    [birth_day_et] => 8
+    [current_grade] => 9th
+    [school_year_start] => 2001
+    [education_level] => Bsc 
+    [field_of_study] => Engineer
+    [phone_number] => 0913197692
+    [has_spiritual_father] => own
+    [spiritual_father_name] => መ/ር ኤልሳ
+    [spiritual_father_phone] => 0938647714
+    [spiritual_father_church] => ሳሪስ ኪዳነ ምህረት
+    [sub_city] => ለሚ ኩራ
+    [district] => 09
+    [specific_area] => ፊጋ
+    [house_number] => -
+    [emergency_name] => ሶሊያና
+    [emergency_phone] => 0919198154
+    [emergency_alt_phone] => 0985459591
+    [emergency_address] => ፊጋ
+    [special_interests] => የለኝም
+    [physical_disability] => የለም
+    [transferred_from_other_school] => የለም
+    [came_from_other_religion] => የለም
+)
+
+[08-Oct-2025 15:20:54 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => IMG_0915.jpeg
+            [full_path] => IMG_0915.jpeg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phppC3qL4
+            [error] => 0
+            [size] => 111443
+        )
+
+)
+
+[08-Oct-2025 15:20:54 UTC] Is AJAX request: NO
+[08-Oct-2025 15:20:54 UTC] Session ID: u5h8m8qjjcu89gookv7ddkf8tr
+[08-Oct-2025 15:20:54 UTC] Admin logged in: NO
+[08-Oct-2025 15:20:54 UTC] Admin login check passed
+[08-Oct-2025 15:20:54 UTC] Form submission detected
+[08-Oct-2025 15:20:54 UTC] Processing POST request
+[08-Oct-2025 15:20:54 UTC] POST[form_submitted]: 1
+[08-Oct-2025 15:20:54 UTC] POST[full_name]: ዲ/ን ሱራፌል ተሾመ ይፍሩ
+[08-Oct-2025 15:20:54 UTC] POST[christian_name]: ገ/ኪሮስ
+[08-Oct-2025 15:20:54 UTC] POST[gender]: male
+[08-Oct-2025 15:20:54 UTC] POST[birth_year_et]: 1991
+[08-Oct-2025 15:20:54 UTC] POST[birth_month_et]: 6
+[08-Oct-2025 15:20:54 UTC] POST[birth_day_et]: 8
+[08-Oct-2025 15:20:54 UTC] POST[current_grade]: 9th
+[08-Oct-2025 15:20:54 UTC] POST[school_year_start]: 2001
+[08-Oct-2025 15:20:54 UTC] POST[education_level]: Bsc 
+[08-Oct-2025 15:20:54 UTC] POST[field_of_study]: Engineer
+[08-Oct-2025 15:20:54 UTC] POST[phone_number]: 0913197692
+[08-Oct-2025 15:20:54 UTC] POST[has_spiritual_father]: own
+[08-Oct-2025 15:20:54 UTC] POST[spiritual_father_name]: መ/ር ኤልሳ
+[08-Oct-2025 15:20:54 UTC] POST[spiritual_father_phone]: 0938647714
+[08-Oct-2025 15:20:54 UTC] POST[spiritual_father_church]: ሳሪስ ኪዳነ ምህረት
+[08-Oct-2025 15:20:54 UTC] POST[sub_city]: ለሚ ኩራ
+[08-Oct-2025 15:20:54 UTC] POST[district]: 09
+[08-Oct-2025 15:20:54 UTC] POST[specific_area]: ፊጋ
+[08-Oct-2025 15:20:54 UTC] POST[house_number]: -
+[08-Oct-2025 15:20:54 UTC] POST[emergency_name]: ሶሊያና
+[08-Oct-2025 15:20:54 UTC] POST[emergency_phone]: 0919198154
+[08-Oct-2025 15:20:54 UTC] POST[emergency_alt_phone]: 0985459591
+[08-Oct-2025 15:20:54 UTC] POST[emergency_address]: ፊጋ
+[08-Oct-2025 15:20:54 UTC] POST[special_interests]: የለኝም
+[08-Oct-2025 15:20:54 UTC] POST[physical_disability]: የለም
+[08-Oct-2025 15:20:54 UTC] POST[transferred_from_other_school]: የለም
+[08-Oct-2025 15:20:54 UTC] POST[came_from_other_religion]: የለም
+[08-Oct-2025 15:20:54 UTC] Name: ዲ/ን ሱራፌል ተሾመ ይፍሩ, Christian name: ገ/ኪሮስ, Gender: male, DOB: 1991-6-8
+[08-Oct-2025 15:20:54 UTC] Phone: 0913197692
+[08-Oct-2025 15:20:54 UTC] Emergency phone: 0919198154, Alt phone: 0985459591
+[08-Oct-2025 15:20:54 UTC] Has spiritual father: own
+[08-Oct-2025 15:20:54 UTC] Emergency name: ሶሊያና, Address: ፊጋ
+[08-Oct-2025 15:20:54 UTC] special_interests: የለኝም
+[08-Oct-2025 15:20:54 UTC] physical_disability: የለም
+[08-Oct-2025 15:20:54 UTC] transferred_from_other_school: የለም
+[08-Oct-2025 15:20:54 UTC] came_from_other_religion: የለም
+[08-Oct-2025 15:20:54 UTC] Checking photo upload
+[08-Oct-2025 15:20:54 UTC] Photo details - name: IMG_0915.jpeg, type: image/jpeg, size: 111443, tmp_name: /tmp/phppC3qL4
+[08-Oct-2025 15:20:54 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[08-Oct-2025 15:20:54 UTC] Upload directory exists: YES
+[08-Oct-2025 15:20:54 UTC] Upload directory writable: YES
+[08-Oct-2025 15:20:54 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e68156a3377.jpg
+[08-Oct-2025 15:20:54 UTC] Photo saved successfully: uploads/68e68156a3377.jpg
+[08-Oct-2025 15:20:54 UTC] Birth date ET: 1991-06-08
+[08-Oct-2025 15:20:54 UTC] Age: 27
+[08-Oct-2025 15:20:54 UTC] Checking for duplicates
+[08-Oct-2025 15:20:54 UTC] Inserting student record
+[08-Oct-2025 15:20:54 UTC] Insert result: SUCCESS
+[08-Oct-2025 15:20:54 UTC] Student ID: 1166
+[08-Oct-2025 15:20:54 UTC] Update result: SUCCESS
+[08-Oct-2025 15:20:54 UTC] Registration successful, redirecting to success page
+[08-Oct-2025 15:20:55 UTC] === process_youth.php STARTED === 2025-10-08 15:20:55
+[08-Oct-2025 15:20:55 UTC] Request method: POST
+[08-Oct-2025 15:20:55 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ዲ/ን ሱራፌል ተሾመ ይፍሩ
+    [christian_name] => ገ/ኪሮስ
+    [gender] => male
+    [birth_year_et] => 1991
+    [birth_month_et] => 6
+    [birth_day_et] => 8
+    [current_grade] => 9th
+    [school_year_start] => 2001
+    [education_level] => Bsc 
+    [field_of_study] => Engineer
+    [phone_number] => 0913197692
+    [has_spiritual_father] => own
+    [spiritual_father_name] => መ/ር ኤልሳ
+    [spiritual_father_phone] => 0938647714
+    [spiritual_father_church] => ሳሪስ ኪዳነ ምህረት
+    [sub_city] => ለሚ ኩራ
+    [district] => 09
+    [specific_area] => ፊጋ
+    [house_number] => -
+    [emergency_name] => ሶሊያና
+    [emergency_phone] => 0919198154
+    [emergency_alt_phone] => 0985459591
+    [emergency_address] => ፊጋ
+    [special_interests] => የለኝም
+    [physical_disability] => የለም
+    [transferred_from_other_school] => የለም
+    [came_from_other_religion] => የለም
+)
+
+[08-Oct-2025 15:20:55 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => IMG_0915.jpeg
+            [full_path] => IMG_0915.jpeg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phppdPDNr
+            [error] => 0
+            [size] => 111443
+        )
+
+)
+
+[08-Oct-2025 15:20:55 UTC] Is AJAX request: NO
+[08-Oct-2025 15:20:55 UTC] Session ID: cg2kiop1s6nuo4btrjcuk156qc
+[08-Oct-2025 15:20:55 UTC] Admin logged in: NO
+[08-Oct-2025 15:20:55 UTC] Admin login check passed
+[08-Oct-2025 15:20:55 UTC] Form submission detected
+[08-Oct-2025 15:20:55 UTC] Processing POST request
+[08-Oct-2025 15:20:55 UTC] POST[form_submitted]: 1
+[08-Oct-2025 15:20:55 UTC] POST[full_name]: ዲ/ን ሱራፌል ተሾመ ይፍሩ
+[08-Oct-2025 15:20:55 UTC] POST[christian_name]: ገ/ኪሮስ
+[08-Oct-2025 15:20:55 UTC] POST[gender]: male
+[08-Oct-2025 15:20:55 UTC] POST[birth_year_et]: 1991
+[08-Oct-2025 15:20:55 UTC] POST[birth_month_et]: 6
+[08-Oct-2025 15:20:55 UTC] POST[birth_day_et]: 8
+[08-Oct-2025 15:20:55 UTC] POST[current_grade]: 9th
+[08-Oct-2025 15:20:55 UTC] POST[school_year_start]: 2001
+[08-Oct-2025 15:20:55 UTC] POST[education_level]: Bsc 
+[08-Oct-2025 15:20:55 UTC] POST[field_of_study]: Engineer
+[08-Oct-2025 15:20:55 UTC] POST[phone_number]: 0913197692
+[08-Oct-2025 15:20:55 UTC] POST[has_spiritual_father]: own
+[08-Oct-2025 15:20:55 UTC] POST[spiritual_father_name]: መ/ር ኤልሳ
+[08-Oct-2025 15:20:55 UTC] POST[spiritual_father_phone]: 0938647714
+[08-Oct-2025 15:20:55 UTC] POST[spiritual_father_church]: ሳሪስ ኪዳነ ምህረት
+[08-Oct-2025 15:20:55 UTC] POST[sub_city]: ለሚ ኩራ
+[08-Oct-2025 15:20:55 UTC] POST[district]: 09
+[08-Oct-2025 15:20:55 UTC] POST[specific_area]: ፊጋ
+[08-Oct-2025 15:20:55 UTC] POST[house_number]: -
+[08-Oct-2025 15:20:55 UTC] POST[emergency_name]: ሶሊያና
+[08-Oct-2025 15:20:55 UTC] POST[emergency_phone]: 0919198154
+[08-Oct-2025 15:20:55 UTC] POST[emergency_alt_phone]: 0985459591
+[08-Oct-2025 15:20:55 UTC] POST[emergency_address]: ፊጋ
+[08-Oct-2025 15:20:55 UTC] POST[special_interests]: የለኝም
+[08-Oct-2025 15:20:55 UTC] POST[physical_disability]: የለም
+[08-Oct-2025 15:20:55 UTC] POST[transferred_from_other_school]: የለም
+[08-Oct-2025 15:20:55 UTC] POST[came_from_other_religion]: የለም
+[08-Oct-2025 15:20:55 UTC] Name: ዲ/ን ሱራፌል ተሾመ ይፍሩ, Christian name: ገ/ኪሮስ, Gender: male, DOB: 1991-6-8
+[08-Oct-2025 15:20:55 UTC] Phone: 0913197692
+[08-Oct-2025 15:20:55 UTC] Emergency phone: 0919198154, Alt phone: 0985459591
+[08-Oct-2025 15:20:55 UTC] Has spiritual father: own
+[08-Oct-2025 15:20:55 UTC] Emergency name: ሶሊያና, Address: ፊጋ
+[08-Oct-2025 15:20:55 UTC] special_interests: የለኝም
+[08-Oct-2025 15:20:55 UTC] physical_disability: የለም
+[08-Oct-2025 15:20:55 UTC] transferred_from_other_school: የለም
+[08-Oct-2025 15:20:55 UTC] came_from_other_religion: የለም
+[08-Oct-2025 15:20:55 UTC] Checking photo upload
+[08-Oct-2025 15:20:55 UTC] Photo details - name: IMG_0915.jpeg, type: image/jpeg, size: 111443, tmp_name: /tmp/phppdPDNr
+[08-Oct-2025 15:20:55 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[08-Oct-2025 15:20:55 UTC] Upload directory exists: YES
+[08-Oct-2025 15:20:55 UTC] Upload directory writable: YES
+[08-Oct-2025 15:20:55 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e6815789fd2.jpg
+[08-Oct-2025 15:20:55 UTC] Photo saved successfully: uploads/68e6815789fd2.jpg
+[08-Oct-2025 15:20:55 UTC] Birth date ET: 1991-06-08
+[08-Oct-2025 15:20:55 UTC] Age: 27
+[08-Oct-2025 15:20:55 UTC] Checking for duplicates
+[08-Oct-2025 15:20:55 UTC] Duplicate found
+[08-Oct-2025 15:20:55 UTC] Exception caught: ይህ ተማሪ በተመሳሳይ ሙሉ ስም እስከ አያት እና ቀን ትውልድ አስቀድሞ ተመዝግቧል።
+[08-Oct-2025 15:20:55 UTC] Exception trace: #0 {main}
+[08-Oct-2025 18:32:21 UTC] === process_youth.php STARTED === 2025-10-08 18:32:21
+[08-Oct-2025 18:32:21 UTC] Request method: POST
+[08-Oct-2025 18:32:21 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ሀገር ታዘበው ብዙነህ
+    [christian_name] => ወለተ ጊዮርጊስ
+    [gender] => female
+    [birth_year_et] => 1995
+    [birth_month_et] => 4
+    [birth_day_et] => 29
+    [current_grade] => 9th
+    [school_year_start] => 2012
+    [education_level] => ኮሌጅ
+    [field_of_study] => -
+    [phone_number] => 0978417210
+    [has_spiritual_father] => own
+    [spiritual_father_name] => ቄስ ፈቀደ
+    [spiritual_father_phone] => 0921771813
+    [spiritual_father_church] => ሰሚት መድኃኔዓለም 
+    [sub_city] => ለሚኩራ
+    [district] => 09
+    [specific_area] => ቄሶችሰፈር
+    [house_number] => -
+    [emergency_name] => ጠጄ ታዘበው ብዙነህ
+    [emergency_phone] => 0978117039
+    [emergency_alt_phone] => 0947110582
+    [emergency_address] => ቄሶች ሰፈር
+    [special_interests] => -
+    [physical_disability] => -
+    [transferred_from_other_school] => -
+    [came_from_other_religion] => -
+)
+
+[08-Oct-2025 18:32:21 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000009667.jpg
+            [full_path] => 1000009667.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpG9O6qN
+            [error] => 0
+            [size] => 2026461
+        )
+
+)
+
+[08-Oct-2025 18:32:21 UTC] Is AJAX request: NO
+[08-Oct-2025 18:32:21 UTC] Session ID: us1e68l3c0i5gchv17id584etv
+[08-Oct-2025 18:32:21 UTC] Admin logged in: NO
+[08-Oct-2025 18:32:21 UTC] Admin login check passed
+[08-Oct-2025 18:32:21 UTC] Form submission detected
+[08-Oct-2025 18:32:21 UTC] Processing POST request
+[08-Oct-2025 18:32:21 UTC] POST[form_submitted]: 1
+[08-Oct-2025 18:32:21 UTC] POST[full_name]: ሀገር ታዘበው ብዙነህ
+[08-Oct-2025 18:32:21 UTC] POST[christian_name]: ወለተ ጊዮርጊስ
+[08-Oct-2025 18:32:21 UTC] POST[gender]: female
+[08-Oct-2025 18:32:21 UTC] POST[birth_year_et]: 1995
+[08-Oct-2025 18:32:21 UTC] POST[birth_month_et]: 4
+[08-Oct-2025 18:32:21 UTC] POST[birth_day_et]: 29
+[08-Oct-2025 18:32:21 UTC] POST[current_grade]: 9th
+[08-Oct-2025 18:32:21 UTC] POST[school_year_start]: 2012
+[08-Oct-2025 18:32:21 UTC] POST[education_level]: ኮሌጅ
+[08-Oct-2025 18:32:21 UTC] POST[field_of_study]: -
+[08-Oct-2025 18:32:21 UTC] POST[phone_number]: 0978417210
+[08-Oct-2025 18:32:21 UTC] POST[has_spiritual_father]: own
+[08-Oct-2025 18:32:21 UTC] POST[spiritual_father_name]: ቄስ ፈቀደ
+[08-Oct-2025 18:32:21 UTC] POST[spiritual_father_phone]: 0921771813
+[08-Oct-2025 18:32:21 UTC] POST[spiritual_father_church]: ሰሚት መድኃኔዓለም 
+[08-Oct-2025 18:32:21 UTC] POST[sub_city]: ለሚኩራ
+[08-Oct-2025 18:32:21 UTC] POST[district]: 09
+[08-Oct-2025 18:32:21 UTC] POST[specific_area]: ቄሶችሰፈር
+[08-Oct-2025 18:32:21 UTC] POST[house_number]: -
+[08-Oct-2025 18:32:21 UTC] POST[emergency_name]: ጠጄ ታዘበው ብዙነህ
+[08-Oct-2025 18:32:21 UTC] POST[emergency_phone]: 0978117039
+[08-Oct-2025 18:32:21 UTC] POST[emergency_alt_phone]: 0947110582
+[08-Oct-2025 18:32:21 UTC] POST[emergency_address]: ቄሶች ሰፈር
+[08-Oct-2025 18:32:21 UTC] POST[special_interests]: -
+[08-Oct-2025 18:32:21 UTC] POST[physical_disability]: -
+[08-Oct-2025 18:32:21 UTC] POST[transferred_from_other_school]: -
+[08-Oct-2025 18:32:21 UTC] POST[came_from_other_religion]: -
+[08-Oct-2025 18:32:21 UTC] Name: ሀገር ታዘበው ብዙነህ, Christian name: ወለተ ጊዮርጊስ, Gender: female, DOB: 1995-4-29
+[08-Oct-2025 18:32:21 UTC] Phone: 0978417210
+[08-Oct-2025 18:32:21 UTC] Emergency phone: 0978117039, Alt phone: 0947110582
+[08-Oct-2025 18:32:21 UTC] Has spiritual father: own
+[08-Oct-2025 18:32:21 UTC] Emergency name: ጠጄ ታዘበው ብዙነህ, Address: ቄሶች ሰፈር
+[08-Oct-2025 18:32:21 UTC] special_interests: -
+[08-Oct-2025 18:32:21 UTC] physical_disability: -
+[08-Oct-2025 18:32:21 UTC] transferred_from_other_school: -
+[08-Oct-2025 18:32:21 UTC] came_from_other_religion: -
+[08-Oct-2025 18:32:21 UTC] Checking photo upload
+[08-Oct-2025 18:32:21 UTC] Photo details - name: 1000009667.jpg, type: image/jpeg, size: 2026461, tmp_name: /tmp/phpG9O6qN
+[08-Oct-2025 18:32:21 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[08-Oct-2025 18:32:21 UTC] Upload directory exists: YES
+[08-Oct-2025 18:32:21 UTC] Upload directory writable: YES
+[08-Oct-2025 18:32:21 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e6ae35ca78d.jpg
+[08-Oct-2025 18:32:21 UTC] Photo saved successfully: uploads/68e6ae35ca78d.jpg
+[08-Oct-2025 18:32:21 UTC] Birth date ET: 1995-04-29
+[08-Oct-2025 18:32:21 UTC] Age: 23
+[08-Oct-2025 18:32:21 UTC] Checking for duplicates
+[08-Oct-2025 18:32:21 UTC] Inserting student record
+[08-Oct-2025 18:32:21 UTC] Insert result: SUCCESS
+[08-Oct-2025 18:32:21 UTC] Student ID: 1167
+[08-Oct-2025 18:32:21 UTC] Update result: SUCCESS
+[08-Oct-2025 18:32:21 UTC] Registration successful, redirecting to success page
+[08-Oct-2025 18:38:10 UTC] === process_youth.php STARTED === 2025-10-08 18:38:10
+[08-Oct-2025 18:38:10 UTC] Request method: POST
+[08-Oct-2025 18:38:10 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ገነት ተከታይ ዘውዱ
+    [christian_name] => ወለተ ጻዲቅ
+    [gender] => female
+    [birth_year_et] => 1997
+    [birth_month_et] => 6
+    [birth_day_et] => 25
+    [current_grade] => 9th
+    [school_year_start] => 2012
+    [education_level] => 12
+    [field_of_study] => -
+    [phone_number] => 0956783973
+    [has_spiritual_father] => own
+    [spiritual_father_name] => ቄስ አሻግሬ
+    [spiritual_father_phone] => 0914077288
+    [spiritual_father_church] => ሰሚት መድኀኔዓለም 
+    [sub_city] => ለሚኩራ
+    [district] => 09
+    [specific_area] => ቄሶች ሰፈር
+    [house_number] => -
+    [emergency_name] => መለሱ ቢተው አያሌው
+    [emergency_phone] => 0915927234
+    [emergency_alt_phone] => 0917848345
+    [emergency_address] => አዲስ አበባ
+    [special_interests] => -
+    [physical_disability] => -
+    [transferred_from_other_school] => -
+    [came_from_other_religion] => -
+)
+
+[08-Oct-2025 18:38:10 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000007669.jpg
+            [full_path] => 1000007669.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpMZzj8h
+            [error] => 0
+            [size] => 681250
+        )
+
+)
+
+[08-Oct-2025 18:38:10 UTC] Is AJAX request: NO
+[08-Oct-2025 18:38:10 UTC] Session ID: us1e68l3c0i5gchv17id584etv
+[08-Oct-2025 18:38:10 UTC] Admin logged in: NO
+[08-Oct-2025 18:38:10 UTC] Admin login check passed
+[08-Oct-2025 18:38:10 UTC] Form submission detected
+[08-Oct-2025 18:38:10 UTC] Processing POST request
+[08-Oct-2025 18:38:10 UTC] POST[form_submitted]: 1
+[08-Oct-2025 18:38:10 UTC] POST[full_name]: ገነት ተከታይ ዘውዱ
+[08-Oct-2025 18:38:10 UTC] POST[christian_name]: ወለተ ጻዲቅ
+[08-Oct-2025 18:38:10 UTC] POST[gender]: female
+[08-Oct-2025 18:38:10 UTC] POST[birth_year_et]: 1997
+[08-Oct-2025 18:38:10 UTC] POST[birth_month_et]: 6
+[08-Oct-2025 18:38:10 UTC] POST[birth_day_et]: 25
+[08-Oct-2025 18:38:10 UTC] POST[current_grade]: 9th
+[08-Oct-2025 18:38:10 UTC] POST[school_year_start]: 2012
+[08-Oct-2025 18:38:10 UTC] POST[education_level]: 12
+[08-Oct-2025 18:38:10 UTC] POST[field_of_study]: -
+[08-Oct-2025 18:38:10 UTC] POST[phone_number]: 0956783973
+[08-Oct-2025 18:38:10 UTC] POST[has_spiritual_father]: own
+[08-Oct-2025 18:38:10 UTC] POST[spiritual_father_name]: ቄስ አሻግሬ
+[08-Oct-2025 18:38:10 UTC] POST[spiritual_father_phone]: 0914077288
+[08-Oct-2025 18:38:10 UTC] POST[spiritual_father_church]: ሰሚት መድኀኔዓለም 
+[08-Oct-2025 18:38:10 UTC] POST[sub_city]: ለሚኩራ
+[08-Oct-2025 18:38:10 UTC] POST[district]: 09
+[08-Oct-2025 18:38:10 UTC] POST[specific_area]: ቄሶች ሰፈር
+[08-Oct-2025 18:38:10 UTC] POST[house_number]: -
+[08-Oct-2025 18:38:10 UTC] POST[emergency_name]: መለሱ ቢተው አያሌው
+[08-Oct-2025 18:38:10 UTC] POST[emergency_phone]: 0915927234
+[08-Oct-2025 18:38:10 UTC] POST[emergency_alt_phone]: 0917848345
+[08-Oct-2025 18:38:10 UTC] POST[emergency_address]: አዲስ አበባ
+[08-Oct-2025 18:38:10 UTC] POST[special_interests]: -
+[08-Oct-2025 18:38:10 UTC] POST[physical_disability]: -
+[08-Oct-2025 18:38:10 UTC] POST[transferred_from_other_school]: -
+[08-Oct-2025 18:38:10 UTC] POST[came_from_other_religion]: -
+[08-Oct-2025 18:38:10 UTC] Name: ገነት ተከታይ ዘውዱ, Christian name: ወለተ ጻዲቅ, Gender: female, DOB: 1997-6-25
+[08-Oct-2025 18:38:10 UTC] Phone: 0956783973
+[08-Oct-2025 18:38:10 UTC] Emergency phone: 0915927234, Alt phone: 0917848345
+[08-Oct-2025 18:38:10 UTC] Has spiritual father: own
+[08-Oct-2025 18:38:10 UTC] Emergency name: መለሱ ቢተው አያሌው, Address: አዲስ አበባ
+[08-Oct-2025 18:38:10 UTC] special_interests: -
+[08-Oct-2025 18:38:10 UTC] physical_disability: -
+[08-Oct-2025 18:38:10 UTC] transferred_from_other_school: -
+[08-Oct-2025 18:38:10 UTC] came_from_other_religion: -
+[08-Oct-2025 18:38:10 UTC] Checking photo upload
+[08-Oct-2025 18:38:10 UTC] Photo details - name: 1000007669.jpg, type: image/jpeg, size: 681250, tmp_name: /tmp/phpMZzj8h
+[08-Oct-2025 18:38:10 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[08-Oct-2025 18:38:10 UTC] Upload directory exists: YES
+[08-Oct-2025 18:38:10 UTC] Upload directory writable: YES
+[08-Oct-2025 18:38:10 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e6af92f007b.jpg
+[08-Oct-2025 18:38:10 UTC] Photo saved successfully: uploads/68e6af92f007b.jpg
+[08-Oct-2025 18:38:10 UTC] Birth date ET: 1997-06-25
+[08-Oct-2025 18:38:10 UTC] Age: 21
+[08-Oct-2025 18:38:10 UTC] Checking for duplicates
+[08-Oct-2025 18:38:10 UTC] Inserting student record
+[08-Oct-2025 18:38:10 UTC] Insert result: SUCCESS
+[08-Oct-2025 18:38:10 UTC] Student ID: 1168
+[08-Oct-2025 18:38:10 UTC] Update result: SUCCESS
+[08-Oct-2025 18:38:10 UTC] Registration successful, redirecting to success page
+[09-Oct-2025 08:47:08 UTC] === process_youth.php STARTED === 2025-10-09 08:47:08
+[09-Oct-2025 08:47:08 UTC] Request method: POST
+[09-Oct-2025 08:47:08 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ቤርሳቤህ አማረ መኮንን
+    [christian_name] => እህተ ማርያም
+    [gender] => female
+    [birth_year_et] => 1992
+    [birth_month_et] => 12
+    [birth_day_et] => 6
+    [current_grade] => new
+    [school_year_start] => 2010
+    [education_level] => ዩኒቨርስቲ 
+    [field_of_study] => አካውንቲንግ 
+    [phone_number] => 0987122677
+    [has_spiritual_father] => own
+    [spiritual_father_name] => መልአከ ታቦር መሰረት
+    [spiritual_father_phone] => 0910355562
+    [spiritual_father_church] => አራብሳ ሚካኤል
+    [sub_city] => ለሚኩራ 
+    [district] => 09
+    [specific_area] => አትሌቶች ሰፈር
+    [house_number] => አዲስ 
+    [emergency_name] => ኢትዮጵያ በለጠ አለማየሁ
+    [emergency_phone] => 0912036109
+    [emergency_alt_phone] => 0911572433
+    [emergency_address] => አአ
+    [special_interests] => የለም
+    [physical_disability] => የለም 
+    [transferred_from_other_school] => አዎ
+    [came_from_other_religion] => የለም
+)
+
+[09-Oct-2025 08:47:08 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 20250812_171357.jpg
+            [full_path] => 20250812_171357.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpR29aVX
+            [error] => 0
+            [size] => 229160
+        )
+
+)
+
+[09-Oct-2025 08:47:08 UTC] Is AJAX request: NO
+[09-Oct-2025 08:47:08 UTC] Session ID: 263a5la9mn620h6ibca9hpi4ih
+[09-Oct-2025 08:47:08 UTC] Admin logged in: NO
+[09-Oct-2025 08:47:08 UTC] Admin login check passed
+[09-Oct-2025 08:47:08 UTC] Form submission detected
+[09-Oct-2025 08:47:08 UTC] Processing POST request
+[09-Oct-2025 08:47:08 UTC] POST[form_submitted]: 1
+[09-Oct-2025 08:47:08 UTC] POST[full_name]: ቤርሳቤህ አማረ መኮንን
+[09-Oct-2025 08:47:08 UTC] POST[christian_name]: እህተ ማርያም
+[09-Oct-2025 08:47:08 UTC] POST[gender]: female
+[09-Oct-2025 08:47:08 UTC] POST[birth_year_et]: 1992
+[09-Oct-2025 08:47:08 UTC] POST[birth_month_et]: 12
+[09-Oct-2025 08:47:08 UTC] POST[birth_day_et]: 6
+[09-Oct-2025 08:47:08 UTC] POST[current_grade]: new
+[09-Oct-2025 08:47:08 UTC] POST[school_year_start]: 2010
+[09-Oct-2025 08:47:08 UTC] POST[education_level]: ዩኒቨርስቲ 
+[09-Oct-2025 08:47:08 UTC] POST[field_of_study]: አካውንቲንግ 
+[09-Oct-2025 08:47:08 UTC] POST[phone_number]: 0987122677
+[09-Oct-2025 08:47:08 UTC] POST[has_spiritual_father]: own
+[09-Oct-2025 08:47:08 UTC] POST[spiritual_father_name]: መልአከ ታቦር መሰረት
+[09-Oct-2025 08:47:08 UTC] POST[spiritual_father_phone]: 0910355562
+[09-Oct-2025 08:47:08 UTC] POST[spiritual_father_church]: አራብሳ ሚካኤል
+[09-Oct-2025 08:47:08 UTC] POST[sub_city]: ለሚኩራ 
+[09-Oct-2025 08:47:08 UTC] POST[district]: 09
+[09-Oct-2025 08:47:08 UTC] POST[specific_area]: አትሌቶች ሰፈር
+[09-Oct-2025 08:47:08 UTC] POST[house_number]: አዲስ 
+[09-Oct-2025 08:47:08 UTC] POST[emergency_name]: ኢትዮጵያ በለጠ አለማየሁ
+[09-Oct-2025 08:47:08 UTC] POST[emergency_phone]: 0912036109
+[09-Oct-2025 08:47:08 UTC] POST[emergency_alt_phone]: 0911572433
+[09-Oct-2025 08:47:08 UTC] POST[emergency_address]: አአ
+[09-Oct-2025 08:47:08 UTC] POST[special_interests]: የለም
+[09-Oct-2025 08:47:08 UTC] POST[physical_disability]: የለም 
+[09-Oct-2025 08:47:08 UTC] POST[transferred_from_other_school]: አዎ
+[09-Oct-2025 08:47:08 UTC] POST[came_from_other_religion]: የለም
+[09-Oct-2025 08:47:08 UTC] Name: ቤርሳቤህ አማረ መኮንን, Christian name: እህተ ማርያም, Gender: female, DOB: 1992-12-6
+[09-Oct-2025 08:47:08 UTC] Phone: 0987122677
+[09-Oct-2025 08:47:08 UTC] Emergency phone: 0912036109, Alt phone: 0911572433
+[09-Oct-2025 08:47:08 UTC] Has spiritual father: own
+[09-Oct-2025 08:47:08 UTC] Emergency name: ኢትዮጵያ በለጠ አለማየሁ, Address: አአ
+[09-Oct-2025 08:47:08 UTC] special_interests: የለም
+[09-Oct-2025 08:47:08 UTC] physical_disability: የለም
+[09-Oct-2025 08:47:08 UTC] transferred_from_other_school: አዎ
+[09-Oct-2025 08:47:08 UTC] came_from_other_religion: የለም
+[09-Oct-2025 08:47:08 UTC] Checking photo upload
+[09-Oct-2025 08:47:08 UTC] Photo details - name: 20250812_171357.jpg, type: image/jpeg, size: 229160, tmp_name: /tmp/phpR29aVX
+[09-Oct-2025 08:47:08 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[09-Oct-2025 08:47:08 UTC] Upload directory exists: YES
+[09-Oct-2025 08:47:08 UTC] Upload directory writable: YES
+[09-Oct-2025 08:47:08 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e7768c30799.jpg
+[09-Oct-2025 08:47:08 UTC] Photo saved successfully: uploads/68e7768c30799.jpg
+[09-Oct-2025 08:47:08 UTC] Birth date ET: 1992-12-06
+[09-Oct-2025 08:47:08 UTC] Age: 26
+[09-Oct-2025 08:47:08 UTC] Checking for duplicates
+[09-Oct-2025 08:47:08 UTC] Inserting student record
+[09-Oct-2025 08:47:08 UTC] Insert result: SUCCESS
+[09-Oct-2025 08:47:08 UTC] Student ID: 1169
+[09-Oct-2025 08:47:08 UTC] Update result: SUCCESS
+[09-Oct-2025 08:47:08 UTC] Registration successful, redirecting to success page
+[09-Oct-2025 08:52:02 UTC] === process_youth.php STARTED === 2025-10-09 08:52:02
+[09-Oct-2025 08:52:02 UTC] Request method: POST
+[09-Oct-2025 08:52:02 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => አብርሃም  ማስሬ
+    [christian_name] => ወለደ የዮሐንስ 
+    [gender] => male
+    [birth_year_et] => 1988
+    [birth_month_et] => 11
+    [birth_day_et] => 29
+    [current_grade] => 11th
+    [school_year_start] => 2010
+    [education_level] => ድግሪ 
+    [field_of_study] => electrical  installation 
+    [phone_number] => 0929283538
+    [has_spiritual_father] => own
+    [spiritual_father_name] => ቄስ አቤ
+    [spiritual_father_phone] => 0913023018
+    [spiritual_father_church] => ሰሚት መድኃኔዓለም 
+    [sub_city] => ለሚ ኩራ
+    [district] => 09
+    [specific_area] => ፊጋ
+    [house_number] => አድስ
+    [emergency_name] => ሀፈታሙ ፀጋ
+    [emergency_phone] => 0911080272
+    [emergency_alt_phone] => 0906626034
+    [emergency_address] => ገርጂ 
+    [special_interests] => ትምህርት 
+    [physical_disability] => አይደለም 
+    [transferred_from_other_school] => አይደለም 
+    [came_from_other_religion] => አይደለም 
+)
+
+[09-Oct-2025 08:52:02 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000001280.png
+            [full_path] => 1000001280.png
+            [type] => image/png
+            [tmp_name] => /tmp/phpfu6HDU
+            [error] => 0
+            [size] => 1212438
+        )
+
+)
+
+[09-Oct-2025 08:52:02 UTC] Is AJAX request: NO
+[09-Oct-2025 08:52:02 UTC] Session ID: 20390k3jn2td1tac9hksok4010
+[09-Oct-2025 08:52:02 UTC] Admin logged in: NO
+[09-Oct-2025 08:52:02 UTC] Admin login check passed
+[09-Oct-2025 08:52:02 UTC] Form submission detected
+[09-Oct-2025 08:52:02 UTC] Processing POST request
+[09-Oct-2025 08:52:02 UTC] POST[form_submitted]: 1
+[09-Oct-2025 08:52:02 UTC] POST[full_name]: አብርሃም  ማስሬ
+[09-Oct-2025 08:52:02 UTC] POST[christian_name]: ወለደ የዮሐንስ 
+[09-Oct-2025 08:52:02 UTC] POST[gender]: male
+[09-Oct-2025 08:52:02 UTC] POST[birth_year_et]: 1988
+[09-Oct-2025 08:52:02 UTC] POST[birth_month_et]: 11
+[09-Oct-2025 08:52:02 UTC] POST[birth_day_et]: 29
+[09-Oct-2025 08:52:02 UTC] POST[current_grade]: 11th
+[09-Oct-2025 08:52:02 UTC] POST[school_year_start]: 2010
+[09-Oct-2025 08:52:02 UTC] POST[education_level]: ድግሪ 
+[09-Oct-2025 08:52:02 UTC] POST[field_of_study]: electrical  installation 
+[09-Oct-2025 08:52:02 UTC] POST[phone_number]: 0929283538
+[09-Oct-2025 08:52:02 UTC] POST[has_spiritual_father]: own
+[09-Oct-2025 08:52:02 UTC] POST[spiritual_father_name]: ቄስ አቤ
+[09-Oct-2025 08:52:02 UTC] POST[spiritual_father_phone]: 0913023018
+[09-Oct-2025 08:52:02 UTC] POST[spiritual_father_church]: ሰሚት መድኃኔዓለም 
+[09-Oct-2025 08:52:02 UTC] POST[sub_city]: ለሚ ኩራ
+[09-Oct-2025 08:52:02 UTC] POST[district]: 09
+[09-Oct-2025 08:52:02 UTC] POST[specific_area]: ፊጋ
+[09-Oct-2025 08:52:02 UTC] POST[house_number]: አድስ
+[09-Oct-2025 08:52:02 UTC] POST[emergency_name]: ሀፈታሙ ፀጋ
+[09-Oct-2025 08:52:02 UTC] POST[emergency_phone]: 0911080272
+[09-Oct-2025 08:52:02 UTC] POST[emergency_alt_phone]: 0906626034
+[09-Oct-2025 08:52:02 UTC] POST[emergency_address]: ገርጂ 
+[09-Oct-2025 08:52:02 UTC] POST[special_interests]: ትምህርት 
+[09-Oct-2025 08:52:02 UTC] POST[physical_disability]: አይደለም 
+[09-Oct-2025 08:52:02 UTC] POST[transferred_from_other_school]: አይደለም 
+[09-Oct-2025 08:52:02 UTC] POST[came_from_other_religion]: አይደለም 
+[09-Oct-2025 08:52:02 UTC] Name: አብርሃም  ማስሬ, Christian name: ወለደ የዮሐንስ, Gender: male, DOB: 1988-11-29
+[09-Oct-2025 08:52:02 UTC] Phone: 0929283538
+[09-Oct-2025 08:52:02 UTC] Emergency phone: 0911080272, Alt phone: 0906626034
+[09-Oct-2025 08:52:02 UTC] Has spiritual father: own
+[09-Oct-2025 08:52:02 UTC] Emergency name: ሀፈታሙ ፀጋ, Address: ገርጂ
+[09-Oct-2025 08:52:02 UTC] special_interests: ትምህርት
+[09-Oct-2025 08:52:02 UTC] physical_disability: አይደለም
+[09-Oct-2025 08:52:02 UTC] transferred_from_other_school: አይደለም
+[09-Oct-2025 08:52:02 UTC] came_from_other_religion: አይደለም
+[09-Oct-2025 08:52:02 UTC] Checking photo upload
+[09-Oct-2025 08:52:02 UTC] Photo details - name: 1000001280.png, type: image/png, size: 1212438, tmp_name: /tmp/phpfu6HDU
+[09-Oct-2025 08:52:02 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[09-Oct-2025 08:52:02 UTC] Upload directory exists: YES
+[09-Oct-2025 08:52:02 UTC] Upload directory writable: YES
+[09-Oct-2025 08:52:02 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e777b2dc881.png
+[09-Oct-2025 08:52:02 UTC] Photo saved successfully: uploads/68e777b2dc881.png
+[09-Oct-2025 08:52:02 UTC] Birth date ET: 1988-11-29
+[09-Oct-2025 08:52:02 UTC] Age: 30
+[09-Oct-2025 08:52:02 UTC] Checking for duplicates
+[09-Oct-2025 08:52:02 UTC] Inserting student record
+[09-Oct-2025 08:52:03 UTC] Insert result: SUCCESS
+[09-Oct-2025 08:52:03 UTC] Student ID: 1170
+[09-Oct-2025 08:52:03 UTC] Update result: SUCCESS
+[09-Oct-2025 08:52:03 UTC] Registration successful, redirecting to success page
+[09-Oct-2025 08:54:06 UTC] Unauthorized access attempt from IP: 196.191.61.61
+[09-Oct-2025 08:54:19 UTC] Unauthorized access attempt from IP: 196.191.61.61
+[09-Oct-2025 11:57:51 UTC] Unauthorized access attempt from IP: 196.191.61.61
+[09-Oct-2025 14:42:11 UTC] === process_youth.php STARTED === 2025-10-09 14:42:11
+[09-Oct-2025 14:42:11 UTC] Request method: POST
+[09-Oct-2025 14:42:11 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => መቅደስ ክንዴ አላምረው 
+    [christian_name] => ወለተ እግዚእ
+    [gender] => female
+    [birth_year_et] => 1995
+    [birth_month_et] => 12
+    [birth_day_et] => 30
+    [current_grade] => 10th
+    [school_year_start] => 2002
+    [education_level] => ዮንቨርስቲ
+    [field_of_study] => ማኔጅመንት
+    [phone_number] => 0985472253
+    [has_spiritual_father] => own
+    [spiritual_father_name] => ቄስ ፀጋዬ
+    [spiritual_father_phone] => 
+    [spiritual_father_church] => ሰሚት መድኀኔአለም 
+    [sub_city] => ለሚ ኩራ
+    [district] => 9
+    [specific_area] => ቄሶች ሰፈር
+    [house_number] => 
+    [emergency_name] => እህተ ሙላት አሸናፊ
+    [emergency_phone] => 0922104181
+    [emergency_alt_phone] => 0941923763
+    [emergency_address] => ቄሶች ሰፈር
+    [special_interests] => ግጥም
+    [physical_disability] => የለም
+    [transferred_from_other_school] => አይደለም
+    [came_from_other_religion] => አይደለም 
+)
+
+[09-Oct-2025 14:42:11 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => IMG_20240107_193621_396.jpg
+            [full_path] => IMG_20240107_193621_396.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpDmdaAa
+            [error] => 0
+            [size] => 49735
+        )
+
+)
+
+[09-Oct-2025 14:42:11 UTC] Is AJAX request: NO
+[09-Oct-2025 14:42:11 UTC] Session ID: ad1vv7kte3fmjoiqp69dimujti
+[09-Oct-2025 14:42:11 UTC] Admin logged in: NO
+[09-Oct-2025 14:42:11 UTC] Admin login check passed
+[09-Oct-2025 14:42:11 UTC] Form submission detected
+[09-Oct-2025 14:42:11 UTC] Processing POST request
+[09-Oct-2025 14:42:11 UTC] POST[form_submitted]: 1
+[09-Oct-2025 14:42:11 UTC] POST[full_name]: መቅደስ ክንዴ አላምረው 
+[09-Oct-2025 14:42:11 UTC] POST[christian_name]: ወለተ እግዚእ
+[09-Oct-2025 14:42:11 UTC] POST[gender]: female
+[09-Oct-2025 14:42:11 UTC] POST[birth_year_et]: 1995
+[09-Oct-2025 14:42:11 UTC] POST[birth_month_et]: 12
+[09-Oct-2025 14:42:11 UTC] POST[birth_day_et]: 30
+[09-Oct-2025 14:42:11 UTC] POST[current_grade]: 10th
+[09-Oct-2025 14:42:11 UTC] POST[school_year_start]: 2002
+[09-Oct-2025 14:42:11 UTC] POST[education_level]: ዮንቨርስቲ
+[09-Oct-2025 14:42:11 UTC] POST[field_of_study]: ማኔጅመንት
+[09-Oct-2025 14:42:11 UTC] POST[phone_number]: 0985472253
+[09-Oct-2025 14:42:11 UTC] POST[has_spiritual_father]: own
+[09-Oct-2025 14:42:11 UTC] POST[spiritual_father_name]: ቄስ ፀጋዬ
+[09-Oct-2025 14:42:11 UTC] POST[spiritual_father_phone]: 
+[09-Oct-2025 14:42:11 UTC] POST[spiritual_father_church]: ሰሚት መድኀኔአለም 
+[09-Oct-2025 14:42:11 UTC] POST[sub_city]: ለሚ ኩራ
+[09-Oct-2025 14:42:11 UTC] POST[district]: 9
+[09-Oct-2025 14:42:11 UTC] POST[specific_area]: ቄሶች ሰፈር
+[09-Oct-2025 14:42:11 UTC] POST[house_number]: 
+[09-Oct-2025 14:42:11 UTC] POST[emergency_name]: እህተ ሙላት አሸናፊ
+[09-Oct-2025 14:42:11 UTC] POST[emergency_phone]: 0922104181
+[09-Oct-2025 14:42:11 UTC] POST[emergency_alt_phone]: 0941923763
+[09-Oct-2025 14:42:11 UTC] POST[emergency_address]: ቄሶች ሰፈር
+[09-Oct-2025 14:42:11 UTC] POST[special_interests]: ግጥም
+[09-Oct-2025 14:42:11 UTC] POST[physical_disability]: የለም
+[09-Oct-2025 14:42:11 UTC] POST[transferred_from_other_school]: አይደለም
+[09-Oct-2025 14:42:11 UTC] POST[came_from_other_religion]: አይደለም 
+[09-Oct-2025 14:42:11 UTC] Name: መቅደስ ክንዴ አላምረው, Christian name: ወለተ እግዚእ, Gender: female, DOB: 1995-12-30
+[09-Oct-2025 14:42:11 UTC] Phone: 0985472253
+[09-Oct-2025 14:42:11 UTC] Emergency phone: 0922104181, Alt phone: 0941923763
+[09-Oct-2025 14:42:11 UTC] Has spiritual father: own
+[09-Oct-2025 14:42:11 UTC] Emergency name: እህተ ሙላት አሸናፊ, Address: ቄሶች ሰፈር
+[09-Oct-2025 14:42:11 UTC] special_interests: ግጥም
+[09-Oct-2025 14:42:11 UTC] physical_disability: የለም
+[09-Oct-2025 14:42:11 UTC] transferred_from_other_school: አይደለም
+[09-Oct-2025 14:42:11 UTC] came_from_other_religion: አይደለም
+[09-Oct-2025 14:42:11 UTC] Checking photo upload
+[09-Oct-2025 14:42:11 UTC] Photo details - name: IMG_20240107_193621_396.jpg, type: image/jpeg, size: 49735, tmp_name: /tmp/phpDmdaAa
+[09-Oct-2025 14:42:11 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[09-Oct-2025 14:42:11 UTC] Upload directory exists: YES
+[09-Oct-2025 14:42:11 UTC] Upload directory writable: YES
+[09-Oct-2025 14:42:11 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e7c9c35eb28.jpg
+[09-Oct-2025 14:42:11 UTC] Photo saved successfully: uploads/68e7c9c35eb28.jpg
+[09-Oct-2025 14:42:11 UTC] Birth date ET: 1995-12-30
+[09-Oct-2025 14:42:11 UTC] Age: 23
+[09-Oct-2025 14:42:11 UTC] Checking for duplicates
+[09-Oct-2025 14:42:11 UTC] Inserting student record
+[09-Oct-2025 14:42:11 UTC] Insert result: SUCCESS
+[09-Oct-2025 14:42:11 UTC] Student ID: 1171
+[09-Oct-2025 14:42:11 UTC] Update result: SUCCESS
+[09-Oct-2025 14:42:11 UTC] Registration successful, redirecting to success page
+[09-Oct-2025 18:07:09 UTC] Unauthorized access attempt from IP: 196.190.62.240
+[09-Oct-2025 18:07:28 UTC] Unauthorized access attempt from IP: 196.190.62.240
+[10-Oct-2025 05:18:32 UTC] === process_youth.php STARTED === 2025-10-10 05:18:32
+[10-Oct-2025 05:18:32 UTC] Request method: POST
+[10-Oct-2025 05:18:32 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ሳምራዊት ተገኝ ነጋ
+    [christian_name] => ወለተ ጊዮርጊስ
+    [gender] => female
+    [birth_year_et] => 1988
+    [birth_month_et] => 3
+    [birth_day_et] => 3
+    [current_grade] => new
+    [school_year_start] => 2018
+    [education_level] => ዲግሪ
+    [field_of_study] => ክሊኒካል ነርሲንግ
+    [phone_number] => 0903577034
+    [has_spiritual_father] => own
+    [spiritual_father_name] => ከሲስ ዮናስ
+    [spiritual_father_phone] => 
+    [spiritual_father_church] => ሰሚት መካነ ሰላም መድሐኒዓለም
+    [sub_city] => አዲስ አበባ
+    [district] => 08
+    [specific_area] => ሰሚት
+    [house_number] => 
+    [emergency_name] => ተገኝ ነጋ ሽበሺ
+    [emergency_phone] => 0911840711
+    [emergency_alt_phone] => 0913123157
+    [emergency_address] => አዲስ አበባ
+    [special_interests] => ኪነጥበብ
+    [physical_disability] => የጆሮ አለመስማት ችግር በከፊል
+    [transferred_from_other_school] => ነባር
+    [came_from_other_religion] => የለም
+)
+
+[10-Oct-2025 05:18:32 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000019392.jpg
+            [full_path] => 1000019392.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpyRxRJh
+            [error] => 0
+            [size] => 190068
+        )
+
+)
+
+[10-Oct-2025 05:18:32 UTC] Is AJAX request: NO
+[10-Oct-2025 05:18:32 UTC] Session ID: jq2hdpbev69osc536s68eq0v1h
+[10-Oct-2025 05:18:32 UTC] Admin logged in: NO
+[10-Oct-2025 05:18:32 UTC] Admin login check passed
+[10-Oct-2025 05:18:32 UTC] Form submission detected
+[10-Oct-2025 05:18:32 UTC] Processing POST request
+[10-Oct-2025 05:18:32 UTC] POST[form_submitted]: 1
+[10-Oct-2025 05:18:32 UTC] POST[full_name]: ሳምራዊት ተገኝ ነጋ
+[10-Oct-2025 05:18:32 UTC] POST[christian_name]: ወለተ ጊዮርጊስ
+[10-Oct-2025 05:18:32 UTC] POST[gender]: female
+[10-Oct-2025 05:18:32 UTC] POST[birth_year_et]: 1988
+[10-Oct-2025 05:18:32 UTC] POST[birth_month_et]: 3
+[10-Oct-2025 05:18:32 UTC] POST[birth_day_et]: 3
+[10-Oct-2025 05:18:32 UTC] POST[current_grade]: new
+[10-Oct-2025 05:18:32 UTC] POST[school_year_start]: 2018
+[10-Oct-2025 05:18:32 UTC] POST[education_level]: ዲግሪ
+[10-Oct-2025 05:18:32 UTC] POST[field_of_study]: ክሊኒካል ነርሲንግ
+[10-Oct-2025 05:18:32 UTC] POST[phone_number]: 0903577034
+[10-Oct-2025 05:18:32 UTC] POST[has_spiritual_father]: own
+[10-Oct-2025 05:18:32 UTC] POST[spiritual_father_name]: ከሲስ ዮናስ
+[10-Oct-2025 05:18:32 UTC] POST[spiritual_father_phone]: 
+[10-Oct-2025 05:18:32 UTC] POST[spiritual_father_church]: ሰሚት መካነ ሰላም መድሐኒዓለም
+[10-Oct-2025 05:18:32 UTC] POST[sub_city]: አዲስ አበባ
+[10-Oct-2025 05:18:32 UTC] POST[district]: 08
+[10-Oct-2025 05:18:32 UTC] POST[specific_area]: ሰሚት
+[10-Oct-2025 05:18:32 UTC] POST[house_number]: 
+[10-Oct-2025 05:18:32 UTC] POST[emergency_name]: ተገኝ ነጋ ሽበሺ
+[10-Oct-2025 05:18:32 UTC] POST[emergency_phone]: 0911840711
+[10-Oct-2025 05:18:32 UTC] POST[emergency_alt_phone]: 0913123157
+[10-Oct-2025 05:18:32 UTC] POST[emergency_address]: አዲስ አበባ
+[10-Oct-2025 05:18:32 UTC] POST[special_interests]: ኪነጥበብ
+[10-Oct-2025 05:18:32 UTC] POST[physical_disability]: የጆሮ አለመስማት ችግር በከፊል
+[10-Oct-2025 05:18:32 UTC] POST[transferred_from_other_school]: ነባር
+[10-Oct-2025 05:18:32 UTC] POST[came_from_other_religion]: የለም
+[10-Oct-2025 05:18:32 UTC] Name: ሳምራዊት ተገኝ ነጋ, Christian name: ወለተ ጊዮርጊስ, Gender: female, DOB: 1988-3-3
+[10-Oct-2025 05:18:32 UTC] Phone: 0903577034
+[10-Oct-2025 05:18:32 UTC] Emergency phone: 0911840711, Alt phone: 0913123157
+[10-Oct-2025 05:18:32 UTC] Has spiritual father: own
+[10-Oct-2025 05:18:32 UTC] Emergency name: ተገኝ ነጋ ሽበሺ, Address: አዲስ አበባ
+[10-Oct-2025 05:18:32 UTC] special_interests: ኪነጥበብ
+[10-Oct-2025 05:18:32 UTC] physical_disability: የጆሮ አለመስማት ችግር በከፊል
+[10-Oct-2025 05:18:32 UTC] transferred_from_other_school: ነባር
+[10-Oct-2025 05:18:32 UTC] came_from_other_religion: የለም
+[10-Oct-2025 05:18:32 UTC] Checking photo upload
+[10-Oct-2025 05:18:32 UTC] Photo details - name: 1000019392.jpg, type: image/jpeg, size: 190068, tmp_name: /tmp/phpyRxRJh
+[10-Oct-2025 05:18:32 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[10-Oct-2025 05:18:32 UTC] Upload directory exists: YES
+[10-Oct-2025 05:18:32 UTC] Upload directory writable: YES
+[10-Oct-2025 05:18:32 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e89728969b1.jpg
+[10-Oct-2025 05:18:32 UTC] Photo saved successfully: uploads/68e89728969b1.jpg
+[10-Oct-2025 05:18:32 UTC] Birth date ET: 1988-03-03
+[10-Oct-2025 05:18:32 UTC] Age: 30
+[10-Oct-2025 05:18:32 UTC] Checking for duplicates
+[10-Oct-2025 05:18:32 UTC] Inserting student record
+[10-Oct-2025 05:18:32 UTC] Insert result: SUCCESS
+[10-Oct-2025 05:18:32 UTC] Student ID: 1172
+[10-Oct-2025 05:18:32 UTC] Update result: SUCCESS
+[10-Oct-2025 05:18:32 UTC] Registration successful, redirecting to success page
+[10-Oct-2025 08:23:15 UTC] Unauthorized access attempt from IP: 196.189.144.122
+[10-Oct-2025 15:49:36 UTC] === process_youth.php STARTED === 2025-10-10 15:49:36
+[10-Oct-2025 15:49:36 UTC] Request method: POST
+[10-Oct-2025 15:49:36 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ገንዘብ ብርሃን ሽፈራ
+    [christian_name] => ወለተ ጻድቅ
+    [gender] => female
+    [birth_year_et] => 1999
+    [birth_month_et] => 2
+    [birth_day_et] => 16
+    [current_grade] => 9th
+    [school_year_start] => 2010
+    [education_level] => 12
+    [field_of_study] => ተማሪ
+    [phone_number] => 0967706065
+    [has_spiritual_father] => own
+    [spiritual_father_name] => ቄስ አሻግሬ
+    [spiritual_father_phone] => 0914077288
+    [spiritual_father_church] => ሰሚት መድኃኔዓለም
+    [sub_city] => ለሚ ኩራ
+    [district] => 09
+    [specific_area] => ወጂ
+    [house_number] =>   የለም
+    [emergency_name] => አምሳለ ተሾመ አሟልቶ
+    [emergency_phone] => 0962184081
+    [emergency_alt_phone] => 0962184081
+    [emergency_address] => አዲስ አበባ 
+    [special_interests] => የለም
+    [physical_disability] => የለም
+    [transferred_from_other_school] => አልተዘዋወረም
+    [came_from_other_religion] => የለም
+)
+
+[10-Oct-2025 15:49:36 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000010318.jpg
+            [full_path] => 1000010318.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/php5QbBgC
+            [error] => 0
+            [size] => 180485
+        )
+
+)
+
+[10-Oct-2025 15:49:36 UTC] Is AJAX request: NO
+[10-Oct-2025 15:49:36 UTC] Session ID: 2b3hvjb4s62pvsjtlo9j0k4n0p
+[10-Oct-2025 15:49:36 UTC] Admin logged in: NO
+[10-Oct-2025 15:49:36 UTC] Admin login check passed
+[10-Oct-2025 15:49:36 UTC] Form submission detected
+[10-Oct-2025 15:49:36 UTC] Processing POST request
+[10-Oct-2025 15:49:36 UTC] POST[form_submitted]: 1
+[10-Oct-2025 15:49:36 UTC] POST[full_name]: ገንዘብ ብርሃን ሽፈራ
+[10-Oct-2025 15:49:36 UTC] POST[christian_name]: ወለተ ጻድቅ
+[10-Oct-2025 15:49:36 UTC] POST[gender]: female
+[10-Oct-2025 15:49:36 UTC] POST[birth_year_et]: 1999
+[10-Oct-2025 15:49:36 UTC] POST[birth_month_et]: 2
+[10-Oct-2025 15:49:36 UTC] POST[birth_day_et]: 16
+[10-Oct-2025 15:49:36 UTC] POST[current_grade]: 9th
+[10-Oct-2025 15:49:36 UTC] POST[school_year_start]: 2010
+[10-Oct-2025 15:49:36 UTC] POST[education_level]: 12
+[10-Oct-2025 15:49:36 UTC] POST[field_of_study]: ተማሪ
+[10-Oct-2025 15:49:36 UTC] POST[phone_number]: 0967706065
+[10-Oct-2025 15:49:36 UTC] POST[has_spiritual_father]: own
+[10-Oct-2025 15:49:36 UTC] POST[spiritual_father_name]: ቄስ አሻግሬ
+[10-Oct-2025 15:49:36 UTC] POST[spiritual_father_phone]: 0914077288
+[10-Oct-2025 15:49:36 UTC] POST[spiritual_father_church]: ሰሚት መድኃኔዓለም
+[10-Oct-2025 15:49:36 UTC] POST[sub_city]: ለሚ ኩራ
+[10-Oct-2025 15:49:36 UTC] POST[district]: 09
+[10-Oct-2025 15:49:36 UTC] POST[specific_area]: ወጂ
+[10-Oct-2025 15:49:36 UTC] POST[house_number]:   የለም
+[10-Oct-2025 15:49:36 UTC] POST[emergency_name]: አምሳለ ተሾመ አሟልቶ
+[10-Oct-2025 15:49:36 UTC] POST[emergency_phone]: 0962184081
+[10-Oct-2025 15:49:36 UTC] POST[emergency_alt_phone]: 0962184081
+[10-Oct-2025 15:49:36 UTC] POST[emergency_address]: አዲስ አበባ 
+[10-Oct-2025 15:49:36 UTC] POST[special_interests]: የለም
+[10-Oct-2025 15:49:36 UTC] POST[physical_disability]: የለም
+[10-Oct-2025 15:49:36 UTC] POST[transferred_from_other_school]: አልተዘዋወረም
+[10-Oct-2025 15:49:36 UTC] POST[came_from_other_religion]: የለም
+[10-Oct-2025 15:49:36 UTC] Name: ገንዘብ ብርሃን ሽፈራ, Christian name: ወለተ ጻድቅ, Gender: female, DOB: 1999-2-16
+[10-Oct-2025 15:49:36 UTC] Phone: 0967706065
+[10-Oct-2025 15:49:36 UTC] Emergency phone: 0962184081, Alt phone: 0962184081
+[10-Oct-2025 15:49:36 UTC] Has spiritual father: own
+[10-Oct-2025 15:49:36 UTC] Emergency name: አምሳለ ተሾመ አሟልቶ, Address: አዲስ አበባ
+[10-Oct-2025 15:49:36 UTC] special_interests: የለም
+[10-Oct-2025 15:49:36 UTC] physical_disability: የለም
+[10-Oct-2025 15:49:36 UTC] transferred_from_other_school: አልተዘዋወረም
+[10-Oct-2025 15:49:36 UTC] came_from_other_religion: የለም
+[10-Oct-2025 15:49:36 UTC] Checking photo upload
+[10-Oct-2025 15:49:36 UTC] Photo details - name: 1000010318.jpg, type: image/jpeg, size: 180485, tmp_name: /tmp/php5QbBgC
+[10-Oct-2025 15:49:36 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[10-Oct-2025 15:49:36 UTC] Upload directory exists: YES
+[10-Oct-2025 15:49:36 UTC] Upload directory writable: YES
+[10-Oct-2025 15:49:36 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e92b10c5403.jpg
+[10-Oct-2025 15:49:36 UTC] Photo saved successfully: uploads/68e92b10c5403.jpg
+[10-Oct-2025 15:49:36 UTC] Birth date ET: 1999-02-16
+[10-Oct-2025 15:49:36 UTC] Age: 19
+[10-Oct-2025 15:49:36 UTC] Checking for duplicates
+[10-Oct-2025 15:49:36 UTC] Inserting student record
+[10-Oct-2025 15:49:36 UTC] Insert result: SUCCESS
+[10-Oct-2025 15:49:36 UTC] Student ID: 1173
+[10-Oct-2025 15:49:36 UTC] Update result: SUCCESS
+[10-Oct-2025 15:49:36 UTC] Registration successful, redirecting to success page
+[10-Oct-2025 18:55:41 UTC] === process_youth.php STARTED === 2025-10-10 18:55:41
+[10-Oct-2025 18:55:41 UTC] Request method: POST
+[10-Oct-2025 18:55:41 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ማስተዋል ሰለሞን ወርቁ
+    [christian_name] => ፅጌ ማርያም
+    [gender] => female
+    [birth_year_et] => 1994
+    [birth_month_et] => 4
+    [birth_day_et] => 11
+    [current_grade] => 9th
+    [school_year_start] => 2013
+    [education_level] => Bsc
+    [field_of_study] => Pharmacist 
+    [phone_number] => 0934214329
+    [has_spiritual_father] => own
+    [spiritual_father_name] => Kes Moges sisay  
+    [spiritual_father_phone] => 091 555 0487
+    [spiritual_father_church] => ሰሚት መድኃኔአለም
+    [sub_city] => ለሚኩራ
+    [district] => 
+    [specific_area] => ሰሚት ሪፊት ቫሊ
+    [house_number] => 
+    [emergency_name] => ሚስጢር ሰለሞን
+    [emergency_phone] => 0932985290
+    [emergency_alt_phone] => 0911985568
+    [emergency_address] => ሰሚት
+    [special_interests] => የለም
+    [physical_disability] => የለም
+    [transferred_from_other_school] => የለም
+    [came_from_other_religion] => የለም
+)
+
+[10-Oct-2025 18:55:41 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000002972.jpg
+            [full_path] => 1000002972.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpLEK3s1
+            [error] => 0
+            [size] => 268870
+        )
+
+)
+
+[10-Oct-2025 18:55:41 UTC] Is AJAX request: NO
+[10-Oct-2025 18:55:41 UTC] Session ID: 0gr48h2ennmvb6idd2j5nomj64
+[10-Oct-2025 18:55:41 UTC] Admin logged in: NO
+[10-Oct-2025 18:55:41 UTC] Admin login check passed
+[10-Oct-2025 18:55:41 UTC] Form submission detected
+[10-Oct-2025 18:55:41 UTC] Processing POST request
+[10-Oct-2025 18:55:41 UTC] POST[form_submitted]: 1
+[10-Oct-2025 18:55:41 UTC] POST[full_name]: ማስተዋል ሰለሞን ወርቁ
+[10-Oct-2025 18:55:41 UTC] POST[christian_name]: ፅጌ ማርያም
+[10-Oct-2025 18:55:41 UTC] POST[gender]: female
+[10-Oct-2025 18:55:41 UTC] POST[birth_year_et]: 1994
+[10-Oct-2025 18:55:41 UTC] POST[birth_month_et]: 4
+[10-Oct-2025 18:55:41 UTC] POST[birth_day_et]: 11
+[10-Oct-2025 18:55:41 UTC] POST[current_grade]: 9th
+[10-Oct-2025 18:55:41 UTC] POST[school_year_start]: 2013
+[10-Oct-2025 18:55:41 UTC] POST[education_level]: Bsc
+[10-Oct-2025 18:55:41 UTC] POST[field_of_study]: Pharmacist 
+[10-Oct-2025 18:55:41 UTC] POST[phone_number]: 0934214329
+[10-Oct-2025 18:55:41 UTC] POST[has_spiritual_father]: own
+[10-Oct-2025 18:55:41 UTC] POST[spiritual_father_name]: Kes Moges sisay  
+[10-Oct-2025 18:55:41 UTC] POST[spiritual_father_phone]: 091 555 0487
+[10-Oct-2025 18:55:41 UTC] POST[spiritual_father_church]: ሰሚት መድኃኔአለም
+[10-Oct-2025 18:55:41 UTC] POST[sub_city]: ለሚኩራ
+[10-Oct-2025 18:55:41 UTC] POST[district]: 
+[10-Oct-2025 18:55:41 UTC] POST[specific_area]: ሰሚት ሪፊት ቫሊ
+[10-Oct-2025 18:55:41 UTC] POST[house_number]: 
+[10-Oct-2025 18:55:41 UTC] POST[emergency_name]: ሚስጢር ሰለሞን
+[10-Oct-2025 18:55:41 UTC] POST[emergency_phone]: 0932985290
+[10-Oct-2025 18:55:41 UTC] POST[emergency_alt_phone]: 0911985568
+[10-Oct-2025 18:55:41 UTC] POST[emergency_address]: ሰሚት
+[10-Oct-2025 18:55:41 UTC] POST[special_interests]: የለም
+[10-Oct-2025 18:55:41 UTC] POST[physical_disability]: የለም
+[10-Oct-2025 18:55:41 UTC] POST[transferred_from_other_school]: የለም
+[10-Oct-2025 18:55:41 UTC] POST[came_from_other_religion]: የለም
+[10-Oct-2025 18:55:41 UTC] Name: ማስተዋል ሰለሞን ወርቁ, Christian name: ፅጌ ማርያም, Gender: female, DOB: 1994-4-11
+[10-Oct-2025 18:55:41 UTC] Phone: 0934214329
+[10-Oct-2025 18:55:41 UTC] Emergency phone: 0932985290, Alt phone: 0911985568
+[10-Oct-2025 18:55:41 UTC] Has spiritual father: own
+[10-Oct-2025 18:55:41 UTC] Emergency name: ሚስጢር ሰለሞን, Address: ሰሚት
+[10-Oct-2025 18:55:41 UTC] special_interests: የለም
+[10-Oct-2025 18:55:41 UTC] physical_disability: የለም
+[10-Oct-2025 18:55:41 UTC] transferred_from_other_school: የለም
+[10-Oct-2025 18:55:41 UTC] came_from_other_religion: የለም
+[10-Oct-2025 18:55:41 UTC] Checking photo upload
+[10-Oct-2025 18:55:41 UTC] Photo details - name: 1000002972.jpg, type: image/jpeg, size: 268870, tmp_name: /tmp/phpLEK3s1
+[10-Oct-2025 18:55:41 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[10-Oct-2025 18:55:41 UTC] Upload directory exists: YES
+[10-Oct-2025 18:55:41 UTC] Upload directory writable: YES
+[10-Oct-2025 18:55:41 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68e956ad6b596.jpg
+[10-Oct-2025 18:55:41 UTC] Photo saved successfully: uploads/68e956ad6b596.jpg
+[10-Oct-2025 18:55:41 UTC] Birth date ET: 1994-04-11
+[10-Oct-2025 18:55:41 UTC] Age: 24
+[10-Oct-2025 18:55:41 UTC] Checking for duplicates
+[10-Oct-2025 18:55:41 UTC] Inserting student record
+[10-Oct-2025 18:55:41 UTC] Insert result: SUCCESS
+[10-Oct-2025 18:55:41 UTC] Student ID: 1175
+[10-Oct-2025 18:55:41 UTC] Update result: SUCCESS
+[10-Oct-2025 18:55:41 UTC] Registration successful, redirecting to success page
+[11-Oct-2025 08:20:11 UTC] === process_youth.php STARTED === 2025-10-11 08:20:11
+[11-Oct-2025 08:20:11 UTC] Request method: POST
+[11-Oct-2025 08:20:11 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => አዱኛ ጌቱ ተካ
+    [christian_name] => ሀ/ሚካኤል 
+    [gender] => male
+    [birth_year_et] => 1987
+    [birth_month_et] => 10
+    [birth_day_et] => 12
+    [current_grade] => 11th
+    [school_year_start] => 1997
+    [education_level] => 10+2
+    [field_of_study] => ኮንስትራክሽን 
+    [phone_number] => 0910431802
+    [has_spiritual_father] => own
+    [spiritual_father_name] => ቄስ ይትባረክ
+    [spiritual_father_phone] => 0985368532
+    [spiritual_father_church] => ሰሚት መድኃኔዓለም 
+    [sub_city] => ቦሌ
+    [district] => 07
+    [specific_area] => ሰፈረ ገነት
+    [house_number] => 468
+    [emergency_name] => አልማዝ ካሳ ጉራራ
+    [emergency_phone] => 0913125133
+    [emergency_alt_phone] => 0985535325
+    [emergency_address] => ቦሌ
+    [special_interests] => የለም 
+    [physical_disability] => የለም 
+    [transferred_from_other_school] => የለም 
+    [came_from_other_religion] => የለም 
+)
+
+[11-Oct-2025 08:20:11 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => captured_photo.jpg
+            [full_path] => captured_photo.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpTZYCI9
+            [error] => 0
+            [size] => 75504
+        )
+
+)
+
+[11-Oct-2025 08:20:11 UTC] Is AJAX request: NO
+[11-Oct-2025 08:20:11 UTC] Session ID: b57vn6mvbsia0e14fucj0j2lba
+[11-Oct-2025 08:20:11 UTC] Admin logged in: NO
+[11-Oct-2025 08:20:11 UTC] Admin login check passed
+[11-Oct-2025 08:20:11 UTC] Form submission detected
+[11-Oct-2025 08:20:11 UTC] Processing POST request
+[11-Oct-2025 08:20:11 UTC] POST[form_submitted]: 1
+[11-Oct-2025 08:20:11 UTC] POST[full_name]: አዱኛ ጌቱ ተካ
+[11-Oct-2025 08:20:11 UTC] POST[christian_name]: ሀ/ሚካኤል 
+[11-Oct-2025 08:20:11 UTC] POST[gender]: male
+[11-Oct-2025 08:20:11 UTC] POST[birth_year_et]: 1987
+[11-Oct-2025 08:20:11 UTC] POST[birth_month_et]: 10
+[11-Oct-2025 08:20:11 UTC] POST[birth_day_et]: 12
+[11-Oct-2025 08:20:11 UTC] POST[current_grade]: 11th
+[11-Oct-2025 08:20:11 UTC] POST[school_year_start]: 1997
+[11-Oct-2025 08:20:11 UTC] POST[education_level]: 10+2
+[11-Oct-2025 08:20:11 UTC] POST[field_of_study]: ኮንስትራክሽን 
+[11-Oct-2025 08:20:11 UTC] POST[phone_number]: 0910431802
+[11-Oct-2025 08:20:11 UTC] POST[has_spiritual_father]: own
+[11-Oct-2025 08:20:11 UTC] POST[spiritual_father_name]: ቄስ ይትባረክ
+[11-Oct-2025 08:20:11 UTC] POST[spiritual_father_phone]: 0985368532
+[11-Oct-2025 08:20:11 UTC] POST[spiritual_father_church]: ሰሚት መድኃኔዓለም 
+[11-Oct-2025 08:20:11 UTC] POST[sub_city]: ቦሌ
+[11-Oct-2025 08:20:11 UTC] POST[district]: 07
+[11-Oct-2025 08:20:11 UTC] POST[specific_area]: ሰፈረ ገነት
+[11-Oct-2025 08:20:11 UTC] POST[house_number]: 468
+[11-Oct-2025 08:20:11 UTC] POST[emergency_name]: አልማዝ ካሳ ጉራራ
+[11-Oct-2025 08:20:11 UTC] POST[emergency_phone]: 0913125133
+[11-Oct-2025 08:20:11 UTC] POST[emergency_alt_phone]: 0985535325
+[11-Oct-2025 08:20:11 UTC] POST[emergency_address]: ቦሌ
+[11-Oct-2025 08:20:11 UTC] POST[special_interests]: የለም 
+[11-Oct-2025 08:20:11 UTC] POST[physical_disability]: የለም 
+[11-Oct-2025 08:20:11 UTC] POST[transferred_from_other_school]: የለም 
+[11-Oct-2025 08:20:11 UTC] POST[came_from_other_religion]: የለም 
+[11-Oct-2025 08:20:11 UTC] Name: አዱኛ ጌቱ ተካ, Christian name: ሀ/ሚካኤል, Gender: male, DOB: 1987-10-12
+[11-Oct-2025 08:20:11 UTC] Phone: 0910431802
+[11-Oct-2025 08:20:11 UTC] Emergency phone: 0913125133, Alt phone: 0985535325
+[11-Oct-2025 08:20:11 UTC] Has spiritual father: own
+[11-Oct-2025 08:20:11 UTC] Emergency name: አልማዝ ካሳ ጉራራ, Address: ቦሌ
+[11-Oct-2025 08:20:11 UTC] special_interests: የለም
+[11-Oct-2025 08:20:11 UTC] physical_disability: የለም
+[11-Oct-2025 08:20:11 UTC] transferred_from_other_school: የለም
+[11-Oct-2025 08:20:11 UTC] came_from_other_religion: የለም
+[11-Oct-2025 08:20:11 UTC] Checking photo upload
+[11-Oct-2025 08:20:11 UTC] Photo details - name: captured_photo.jpg, type: image/jpeg, size: 75504, tmp_name: /tmp/phpTZYCI9
+[11-Oct-2025 08:20:11 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[11-Oct-2025 08:20:11 UTC] Upload directory exists: YES
+[11-Oct-2025 08:20:11 UTC] Upload directory writable: YES
+[11-Oct-2025 08:20:11 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68ea133b9c593.jpg
+[11-Oct-2025 08:20:11 UTC] Photo saved successfully: uploads/68ea133b9c593.jpg
+[11-Oct-2025 08:20:11 UTC] Birth date ET: 1987-10-12
+[11-Oct-2025 08:20:11 UTC] Age: 31
+[11-Oct-2025 08:20:11 UTC] Checking for duplicates
+[11-Oct-2025 08:20:11 UTC] Inserting student record
+[11-Oct-2025 08:20:11 UTC] Insert result: SUCCESS
+[11-Oct-2025 08:20:11 UTC] Student ID: 1176
+[11-Oct-2025 08:20:11 UTC] Update result: SUCCESS
+[11-Oct-2025 08:20:11 UTC] Registration successful, redirecting to success page
+[11-Oct-2025 13:34:17 UTC] Unauthorized access attempt from IP: 196.190.52.98
+[11-Oct-2025 19:40:10 UTC] === process_youth.php STARTED === 2025-10-11 19:40:10
+[11-Oct-2025 19:40:10 UTC] Request method: POST
+[11-Oct-2025 19:40:10 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ሙልዬ መንግስቱ ምስጋናው 
+    [christian_name] => ፅጌ ማርያም 
+    [gender] => female
+    [birth_year_et] => 1994
+    [birth_month_et] => 1
+    [birth_day_et] => 29
+    [current_grade] => new
+    [school_year_start] => 2018
+    [education_level] => ዲፕሎማ 
+    [field_of_study] => It
+    [phone_number] => 0953123492
+    [has_spiritual_father] => own
+    [spiritual_father_name] => ቀሲስ አበበ 
+    [spiritual_father_phone] => 
+    [spiritual_father_church] => መካነ ሰላም ሰሚት መድኃኒዓለም 
+    [sub_city] => ለሚ ኩራ 
+    [district] => 09
+    [specific_area] => 
+    [house_number] => 
+    [emergency_name] => መ /ታ መንግስቱ ምስጋናው 
+    [emergency_phone] => 0913631755
+    [emergency_alt_phone] => 0940164856
+    [emergency_address] => አዲስ አበባ 
+    [special_interests] => ምንም 
+    [physical_disability] => የለም 
+    [transferred_from_other_school] => የለም 
+    [came_from_other_religion] => የለም 
+)
+
+[11-Oct-2025 19:40:10 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000032693.webp
+            [full_path] => 1000032693.webp
+            [type] => image/webp
+            [tmp_name] => /tmp/phpDCHPYh
+            [error] => 0
+            [size] => 2718736
+        )
+
+)
+
+[11-Oct-2025 19:40:10 UTC] Is AJAX request: NO
+[11-Oct-2025 19:40:10 UTC] Session ID: 1h7fmk5nbbu6im7sak8l8uvolp
+[11-Oct-2025 19:40:10 UTC] Admin logged in: NO
+[11-Oct-2025 19:40:10 UTC] Admin login check passed
+[11-Oct-2025 19:40:10 UTC] Form submission detected
+[11-Oct-2025 19:40:10 UTC] Processing POST request
+[11-Oct-2025 19:40:10 UTC] POST[form_submitted]: 1
+[11-Oct-2025 19:40:10 UTC] POST[full_name]: ሙልዬ መንግስቱ ምስጋናው 
+[11-Oct-2025 19:40:10 UTC] POST[christian_name]: ፅጌ ማርያም 
+[11-Oct-2025 19:40:10 UTC] POST[gender]: female
+[11-Oct-2025 19:40:10 UTC] POST[birth_year_et]: 1994
+[11-Oct-2025 19:40:10 UTC] POST[birth_month_et]: 1
+[11-Oct-2025 19:40:10 UTC] POST[birth_day_et]: 29
+[11-Oct-2025 19:40:10 UTC] POST[current_grade]: new
+[11-Oct-2025 19:40:10 UTC] POST[school_year_start]: 2018
+[11-Oct-2025 19:40:10 UTC] POST[education_level]: ዲፕሎማ 
+[11-Oct-2025 19:40:10 UTC] POST[field_of_study]: It
+[11-Oct-2025 19:40:10 UTC] POST[phone_number]: 0953123492
+[11-Oct-2025 19:40:10 UTC] POST[has_spiritual_father]: own
+[11-Oct-2025 19:40:10 UTC] POST[spiritual_father_name]: ቀሲስ አበበ 
+[11-Oct-2025 19:40:10 UTC] POST[spiritual_father_phone]: 
+[11-Oct-2025 19:40:10 UTC] POST[spiritual_father_church]: መካነ ሰላም ሰሚት መድኃኒዓለም 
+[11-Oct-2025 19:40:10 UTC] POST[sub_city]: ለሚ ኩራ 
+[11-Oct-2025 19:40:10 UTC] POST[district]: 09
+[11-Oct-2025 19:40:10 UTC] POST[specific_area]: 
+[11-Oct-2025 19:40:10 UTC] POST[house_number]: 
+[11-Oct-2025 19:40:10 UTC] POST[emergency_name]: መ /ታ መንግስቱ ምስጋናው 
+[11-Oct-2025 19:40:10 UTC] POST[emergency_phone]: 0913631755
+[11-Oct-2025 19:40:10 UTC] POST[emergency_alt_phone]: 0940164856
+[11-Oct-2025 19:40:10 UTC] POST[emergency_address]: አዲስ አበባ 
+[11-Oct-2025 19:40:10 UTC] POST[special_interests]: ምንም 
+[11-Oct-2025 19:40:10 UTC] POST[physical_disability]: የለም 
+[11-Oct-2025 19:40:10 UTC] POST[transferred_from_other_school]: የለም 
+[11-Oct-2025 19:40:10 UTC] POST[came_from_other_religion]: የለም 
+[11-Oct-2025 19:40:10 UTC] Name: ሙልዬ መንግስቱ ምስጋናው, Christian name: ፅጌ ማርያም, Gender: female, DOB: 1994-1-29
+[11-Oct-2025 19:40:10 UTC] Phone: 0953123492
+[11-Oct-2025 19:40:10 UTC] Emergency phone: 0913631755, Alt phone: 0940164856
+[11-Oct-2025 19:40:10 UTC] Has spiritual father: own
+[11-Oct-2025 19:40:10 UTC] Emergency name: መ /ታ መንግስቱ ምስጋናው, Address: አዲስ አበባ
+[11-Oct-2025 19:40:10 UTC] special_interests: ምንም
+[11-Oct-2025 19:40:10 UTC] physical_disability: የለም
+[11-Oct-2025 19:40:10 UTC] transferred_from_other_school: የለም
+[11-Oct-2025 19:40:10 UTC] came_from_other_religion: የለም
+[11-Oct-2025 19:40:10 UTC] Checking photo upload
+[11-Oct-2025 19:40:10 UTC] Photo details - name: 1000032693.webp, type: image/webp, size: 2718736, tmp_name: /tmp/phpDCHPYh
+[11-Oct-2025 19:40:10 UTC] Invalid photo type or size
+[11-Oct-2025 19:40:10 UTC] Exception caught: Invalid photo
+[11-Oct-2025 19:40:10 UTC] Exception trace: #0 {main}
+[11-Oct-2025 19:45:48 UTC] === process_youth.php STARTED === 2025-10-11 19:45:48
+[11-Oct-2025 19:45:48 UTC] Request method: POST
+[11-Oct-2025 19:45:48 UTC] POST data: Array
+(
+    [form_submitted] => 1
+    [full_name] => ሙልዬ መንግስቱ ምስጋናው 
+    [christian_name] => ፅጌ ማርያም 
+    [gender] => female
+    [birth_year_et] => 1994
+    [birth_month_et] => 1
+    [birth_day_et] => 29
+    [current_grade] => new
+    [school_year_start] => 2018
+    [education_level] => ዲፕሎማ 
+    [field_of_study] => It
+    [phone_number] => 0953123492
+    [has_spiritual_father] => none
+    [spiritual_father_name] => 
+    [spiritual_father_phone] => 
+    [spiritual_father_church] => 
+    [sub_city] => ለሚ ኩራ 
+    [district] => 09
+    [specific_area] => ሰሚት 
+    [house_number] => የለም 
+    [emergency_name] => መ /ታ መንግስቱ ምስጋናው 
+    [emergency_phone] => 0913631755
+    [emergency_alt_phone] => 0940164856
+    [emergency_address] => አዲስ አበባ 
+    [special_interests] => መዝሙር 
+    [physical_disability] => የለብኝም 
+    [transferred_from_other_school] => አይደለም 
+    [came_from_other_religion] => አይደለም 
+)
+
+[11-Oct-2025 19:45:48 UTC] FILES data: Array
+(
+    [student_photo] => Array
+        (
+            [name] => 1000003011.jpg
+            [full_path] => 1000003011.jpg
+            [type] => image/jpeg
+            [tmp_name] => /tmp/phpJa0xq1
+            [error] => 0
+            [size] => 1633237
+        )
+
+)
+
+[11-Oct-2025 19:45:48 UTC] Is AJAX request: NO
+[11-Oct-2025 19:45:48 UTC] Session ID: 1h7fmk5nbbu6im7sak8l8uvolp
+[11-Oct-2025 19:45:48 UTC] Admin logged in: NO
+[11-Oct-2025 19:45:48 UTC] Admin login check passed
+[11-Oct-2025 19:45:48 UTC] Form submission detected
+[11-Oct-2025 19:45:48 UTC] Processing POST request
+[11-Oct-2025 19:45:48 UTC] POST[form_submitted]: 1
+[11-Oct-2025 19:45:48 UTC] POST[full_name]: ሙልዬ መንግስቱ ምስጋናው 
+[11-Oct-2025 19:45:48 UTC] POST[christian_name]: ፅጌ ማርያም 
+[11-Oct-2025 19:45:48 UTC] POST[gender]: female
+[11-Oct-2025 19:45:48 UTC] POST[birth_year_et]: 1994
+[11-Oct-2025 19:45:48 UTC] POST[birth_month_et]: 1
+[11-Oct-2025 19:45:48 UTC] POST[birth_day_et]: 29
+[11-Oct-2025 19:45:48 UTC] POST[current_grade]: new
+[11-Oct-2025 19:45:48 UTC] POST[school_year_start]: 2018
+[11-Oct-2025 19:45:48 UTC] POST[education_level]: ዲፕሎማ 
+[11-Oct-2025 19:45:48 UTC] POST[field_of_study]: It
+[11-Oct-2025 19:45:48 UTC] POST[phone_number]: 0953123492
+[11-Oct-2025 19:45:48 UTC] POST[has_spiritual_father]: none
+[11-Oct-2025 19:45:48 UTC] POST[spiritual_father_name]: 
+[11-Oct-2025 19:45:48 UTC] POST[spiritual_father_phone]: 
+[11-Oct-2025 19:45:48 UTC] POST[spiritual_father_church]: 
+[11-Oct-2025 19:45:48 UTC] POST[sub_city]: ለሚ ኩራ 
+[11-Oct-2025 19:45:48 UTC] POST[district]: 09
+[11-Oct-2025 19:45:48 UTC] POST[specific_area]: ሰሚት 
+[11-Oct-2025 19:45:48 UTC] POST[house_number]: የለም 
+[11-Oct-2025 19:45:48 UTC] POST[emergency_name]: መ /ታ መንግስቱ ምስጋናው 
+[11-Oct-2025 19:45:48 UTC] POST[emergency_phone]: 0913631755
+[11-Oct-2025 19:45:48 UTC] POST[emergency_alt_phone]: 0940164856
+[11-Oct-2025 19:45:48 UTC] POST[emergency_address]: አዲስ አበባ 
+[11-Oct-2025 19:45:48 UTC] POST[special_interests]: መዝሙር 
+[11-Oct-2025 19:45:48 UTC] POST[physical_disability]: የለብኝም 
+[11-Oct-2025 19:45:48 UTC] POST[transferred_from_other_school]: አይደለም 
+[11-Oct-2025 19:45:48 UTC] POST[came_from_other_religion]: አይደለም 
+[11-Oct-2025 19:45:48 UTC] Name: ሙልዬ መንግስቱ ምስጋናው, Christian name: ፅጌ ማርያም, Gender: female, DOB: 1994-1-29
+[11-Oct-2025 19:45:48 UTC] Phone: 0953123492
+[11-Oct-2025 19:45:48 UTC] Emergency phone: 0913631755, Alt phone: 0940164856
+[11-Oct-2025 19:45:48 UTC] Has spiritual father: none
+[11-Oct-2025 19:45:48 UTC] Emergency name: መ /ታ መንግስቱ ምስጋናው, Address: አዲስ አበባ
+[11-Oct-2025 19:45:48 UTC] special_interests: መዝሙር
+[11-Oct-2025 19:45:48 UTC] physical_disability: የለብኝም
+[11-Oct-2025 19:45:48 UTC] transferred_from_other_school: አይደለም
+[11-Oct-2025 19:45:48 UTC] came_from_other_religion: አይደለም
+[11-Oct-2025 19:45:48 UTC] Checking photo upload
+[11-Oct-2025 19:45:48 UTC] Photo details - name: 1000003011.jpg, type: image/jpeg, size: 1633237, tmp_name: /tmp/phpJa0xq1
+[11-Oct-2025 19:45:48 UTC] Upload directory: /home/finotekv/learn.finoteselamss.org/uploads
+[11-Oct-2025 19:45:48 UTC] Upload directory exists: YES
+[11-Oct-2025 19:45:48 UTC] Upload directory writable: YES
+[11-Oct-2025 19:45:48 UTC] Destination file: /home/finotekv/learn.finoteselamss.org/uploads/68eab3ec4077b.jpg
+[11-Oct-2025 19:45:48 UTC] Photo saved successfully: uploads/68eab3ec4077b.jpg
+[11-Oct-2025 19:45:48 UTC] Birth date ET: 1994-01-29
+[11-Oct-2025 19:45:48 UTC] Age: 25
+[11-Oct-2025 19:45:48 UTC] Checking for duplicates
+[11-Oct-2025 19:45:48 UTC] Inserting student record
+[11-Oct-2025 19:45:48 UTC] Insert result: SUCCESS
+[11-Oct-2025 19:45:48 UTC] Student ID: 1177
+[11-Oct-2025 19:45:48 UTC] Update result: SUCCESS
+[11-Oct-2025 19:45:48 UTC] Registration successful, redirecting to success page
+[12-Oct-2025 05:30:52 UTC] Unauthorized access attempt from IP: 196.190.52.98
+[12-Oct-2025 05:31:17 UTC] Unauthorized access attempt from IP: 213.55.110.5
+[12-Oct-2025 06:47:08 UTC] Unauthorized access attempt from IP: 196.189.145.246
+[12-Oct-2025 07:59:20 UTC] Unauthorized access attempt from IP: 196.191.61.166
+[23-Feb-2026 12:25:20 UTC] Database connection failed: SQLSTATE[28000] [1045] Access denied for user 'root'@'localhost' (using password: NO)
+[23-Feb-2026 13:07:15 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:07:52 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:08:33 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:33:37 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:38:51 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:38:51 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:44:24 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:44:25 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:48:10 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:58:40 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 13:58:41 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:06:17 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:14:30 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:15:12 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:15:13 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:17:54 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:17:54 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:20:13 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:20:15 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:30:04 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[23-Feb-2026 14:30:05 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[24-Feb-2026 06:52:15 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[24-Feb-2026 07:16:08 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[24-Feb-2026 07:23:59 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=2...' at line 2
+[24-Feb-2026 07:25:49 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function requireAdminLogin() in /home/finotekv/lms.finoteselamss.org/dashboard.php:7
+Stack trace:
+#0 {main}
+  thrown in /home/finotekv/lms.finoteselamss.org/dashboard.php on line 7
+[24-Feb-2026 07:30:55 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=...' at line 2
+[24-Feb-2026 07:31:46 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=...' at line 2
+[24-Feb-2026 07:31:48 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=...' at line 2
+[24-Feb-2026 07:31:49 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=...' at line 2
+[24-Feb-2026 07:31:49 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=...' at line 2
+[24-Feb-2026 07:31:49 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=...' at line 2
+[24-Feb-2026 07:31:50 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=...' at line 2
+[24-Feb-2026 07:31:50 UTC] Database connection failed: SQLSTATE[42000] [1064] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'SET SESSION wait_timeout=28800,
+            SET SESSION interactive_timeout=...' at line 2
+[24-Feb-2026 07:56:59 UTC] Unauthorized access attempt from IP: 104.28.220.16
+[24-Feb-2026 07:59:30 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "CACHE_TTL_DASHBOARD" in /home/finotekv/lms.finoteselamss.org/dashboard.php:87
+Stack trace:
+#0 {main}
+  thrown in /home/finotekv/lms.finoteselamss.org/dashboard.php on line 87
+[24-Feb-2026 07:59:31 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "CACHE_TTL_DASHBOARD" in /home/finotekv/lms.finoteselamss.org/dashboard.php:87
+Stack trace:
+#0 {main}
+  thrown in /home/finotekv/lms.finoteselamss.org/dashboard.php on line 87
+[24-Feb-2026 08:03:13 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:03:13 UTC] PHP Fatal error:  Cannot redeclare function cache_get() (previously declared in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php:152) in /home/finotekv/lms.finoteselamss.org/includes/cache.php on line 167
+[24-Feb-2026 08:03:13 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:03:13 UTC] PHP Fatal error:  Cannot redeclare function cache_get() (previously declared in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php:152) in /home/finotekv/lms.finoteselamss.org/includes/cache.php on line 167
+[24-Feb-2026 08:07:15 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:07:15 UTC] PHP Fatal error:  Cannot redeclare function cache_get() (previously declared in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php:152) in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php on line 152
+[24-Feb-2026 08:07:16 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:07:16 UTC] PHP Fatal error:  Cannot redeclare function cache_get() (previously declared in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php:152) in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php on line 152
+[24-Feb-2026 08:25:32 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:25:32 UTC] PHP Fatal error:  Cannot redeclare function cache_get() (previously declared in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php:152) in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php on line 152
+[24-Feb-2026 08:25:33 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:25:33 UTC] PHP Fatal error:  Cannot redeclare function cache_get() (previously declared in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php:152) in /home/finotekv/lms.finoteselamss.org/includes/cache_manager.php on line 152
+[24-Feb-2026 08:25:52 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:25:53 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:26:12 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:26:13 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:26:13 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:26:14 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:26:47 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
+[24-Feb-2026 08:26:48 UTC] PHP Warning:  Constant CACHE_TTL_DASHBOARD already defined in /home/finotekv/lms.finoteselamss.org/includes/students_helpers.php on line 8
