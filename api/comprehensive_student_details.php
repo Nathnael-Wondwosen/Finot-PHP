@@ -34,11 +34,24 @@ try {
         m.full_name AS mother_full_name, m.christian_name AS mother_christian_name, 
         m.phone_number AS mother_phone, m.occupation AS mother_occupation,
         g.full_name AS guardian_full_name, g.christian_name AS guardian_christian_name, 
-        g.phone_number AS guardian_phone, g.occupation AS guardian_occupation
+        g.phone_number AS guardian_phone, g.occupation AS guardian_occupation,
+        c.id AS active_class_id, c.name AS active_class_name, c.grade AS active_class_grade, c.section AS active_class_section,
+        ce_active.enrollment_date AS active_class_enrollment_date
     FROM students s
     LEFT JOIN parents f ON s.id = f.student_id AND f.parent_type = 'father'
     LEFT JOIN parents m ON s.id = m.student_id AND m.parent_type = 'mother'
     LEFT JOIN parents g ON s.id = g.student_id AND g.parent_type = 'guardian'
+    LEFT JOIN (
+        SELECT ce1.student_id, ce1.class_id, ce1.enrollment_date
+        FROM class_enrollments ce1
+        INNER JOIN (
+            SELECT student_id, MAX(id) AS max_id
+            FROM class_enrollments
+            WHERE status = 'active'
+            GROUP BY student_id
+        ) latest ON latest.max_id = ce1.id
+    ) ce_active ON s.id = ce_active.student_id
+    LEFT JOIN classes c ON ce_active.class_id = c.id
     WHERE s.id = ? LIMIT 1");
     
     $stmt->execute([$id]);
@@ -152,6 +165,16 @@ try {
                         <div><strong>Christian Name:</strong> <?= $display($student['christian_name']) ?></div>
                         <div><strong>Gender:</strong> <?= $display($student['gender']) ?></div>
                         <div><strong>Phone:</strong> <?= $display($student['phone_number']) ?></div>
+                        <div><strong>Current Class:</strong>
+                            <?php if (!empty($student['active_class_id'])): ?>
+                                <?= $display($student['active_class_name']) ?>
+                                <?php if (!empty($student['active_class_grade'])): ?>
+                                    (Grade <?= $display($student['active_class_grade']) ?><?= !empty($student['active_class_section']) ? ', Sec ' . $display($student['active_class_section']) : '' ?>)
+                                <?php endif; ?>
+                            <?php else: ?>
+                                -
+                            <?php endif; ?>
+                        </div>
                         <div><strong>Registration Date:</strong> <?= $student['created_at'] ? $e(date('M j, Y g:i A', strtotime($student['created_at']))) : '-' ?></div>
                     </div>
                 </div>
@@ -206,6 +229,13 @@ try {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="space-y-2">
                     <div class="text-sm"><strong>Current Grade:</strong> <?= $display($student['current_grade']) ?></div>
+                    <div class="text-sm"><strong>Assigned Class:</strong>
+                        <?php if (!empty($student['active_class_id'])): ?>
+                            <?= $display($student['active_class_name']) ?>
+                        <?php else: ?>
+                            -
+                        <?php endif; ?>
+                    </div>
                     <div class="text-sm"><strong>School Year Start:</strong> <?= $display($student['school_year_start']) ?></div>
                     <div class="text-sm"><strong>Regular School Name:</strong> <?= $display($student['regular_school_name']) ?></div>
                     <div class="text-sm"><strong>Regular School Grade:</strong> <?= $display($student['regular_school_grade']) ?></div>

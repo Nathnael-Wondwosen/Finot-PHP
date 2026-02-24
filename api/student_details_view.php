@@ -308,6 +308,27 @@ try {
         return '';
     };
 
+    // Resolve active class for linked student profile (students table or linked instrument record).
+    $activeClass = null;
+    $linkedStudentId = null;
+    if ($table === 'students' && !empty($display['id'])) {
+        $linkedStudentId = (int)$display['id'];
+    } elseif ($table === 'instruments' && !empty($display['student_id'])) {
+        $linkedStudentId = (int)$display['student_id'];
+    }
+    if (!empty($linkedStudentId)) {
+        $stmtClass = $pdo->prepare("
+            SELECT c.id, c.name, c.grade, c.section, ce.enrollment_date
+            FROM class_enrollments ce
+            JOIN classes c ON c.id = ce.class_id
+            WHERE ce.student_id = ? AND ce.status = 'active'
+            ORDER BY ce.id DESC
+            LIMIT 1
+        ");
+        $stmtClass->execute([$linkedStudentId]);
+        $activeClass = $stmtClass->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
     // Build HTML output
     ob_start();
 ?>
@@ -355,6 +376,9 @@ try {
                     <?php if (!empty($display['current_grade'])): ?>
                         <span>Grade: <?= $e($display['current_grade']) ?></span>
                     <?php endif; ?>
+                    <?php if (!empty($activeClass['id'])): ?>
+                        <span class="ml-2">Class: <?= $e($activeClass['name'] ?? '-') ?></span>
+                    <?php endif; ?>
                     <?php $dobEt = $formatDobEthiopic($display, $table); if ($dobEt !== ''): ?>
                         <span class="ml-2">DOB: <?= $dobEt ?></span>
                     <?php endif; ?>
@@ -399,6 +423,18 @@ try {
                         <div class="text-orange-600 dark:text-orange-400"><i class="fas fa-unlink mr-1"></i> No Linked Student Record</div>
                         <div class="text-blue-600 dark:text-blue-400 text-xs"><i class="fas fa-info-circle mr-1"></i> Showing instrument registration data</div>
                     <?php endif; ?>
+                    <div class="text-gray-600 dark:text-gray-400 text-xs">
+                        <i class="fas fa-school mr-1"></i>
+                        Current class:
+                        <?php if (!empty($activeClass['id'])): ?>
+                            <?= $e($activeClass['name']) ?>
+                            <?php if (!empty($activeClass['grade'])): ?>
+                                (Grade <?= $e($activeClass['grade']) ?><?= !empty($activeClass['section']) ? ', Sec ' . $e($activeClass['section']) : '' ?>)
+                            <?php endif; ?>
+                        <?php else: ?>
+                            -
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>

@@ -833,6 +833,11 @@ function saveEnhancedStudentChanges(silent = false) {
     updateSaveStatusIndicator('Saving...');
     
     const formData = new FormData(form);
+    // Do not send invalid/empty Ethiopian birth date values.
+    const birthDate = String(formData.get('birth_date') || '').trim();
+    if (!birthDate || birthDate === '0000-00-00' || birthDate.endsWith('-00') || birthDate.includes('--')) {
+        formData.delete('birth_date');
+    }
     formData.append('action', 'update_student');
     formData.append('student_id', window.currentEditingStudent.id);
     formData.append('table', window.currentEditingTable || 'students');
@@ -1130,15 +1135,20 @@ function initializeEditEthiopianCalendar() {
             populateDays();
             dSel.value = student.birth_day_et;
             updateHiddenBirthDate();
-        } else if (student.birth_date) {
+        } else if (student.birth_date && student.birth_date !== '0000-00-00') {
             // Parse from birth_date string (YYYY-MM-DD format)
             const parts = student.birth_date.split('-');
             if (parts.length === 3) {
-                ySel.value = parts[0];
-                mSel.value = parseInt(parts[1], 10).toString();
-                populateDays();
-                dSel.value = parseInt(parts[2], 10).toString();
-                updateHiddenBirthDate();
+                const y = parseInt(parts[0], 10);
+                const m = parseInt(parts[1], 10);
+                const d = parseInt(parts[2], 10);
+                if (y > 0 && m > 0 && d > 0) {
+                    ySel.value = String(y);
+                    mSel.value = String(m);
+                    populateDays();
+                    dSel.value = String(d);
+                    updateHiddenBirthDate();
+                }
             }
         }
     }

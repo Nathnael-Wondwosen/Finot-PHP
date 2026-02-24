@@ -278,6 +278,176 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     echo json_encode(['success' => false, 'message' => 'Assignment failed: ' . $e->getMessage()]);
                 }
                 break;
+
+            case 'quick_add_students':
+                $class_id = (int)($_POST['class_id'] ?? 0);
+                $raw_names = trim((string)($_POST['full_names'] ?? ''));
+
+                if ($class_id <= 0) {
+                    echo json_encode(['success' => false, 'message' => 'Class ID is required']);
+                    break;
+                }
+
+                if ($raw_names === '') {
+                    echo json_encode(['success' => false, 'message' => 'Please enter at least one full name']);
+                    break;
+                }
+
+                // Support one name per line, comma-separated, or semicolon-separated.
+                $parts = preg_split('/[\r\n,;]+/', $raw_names) ?: [];
+                $name_list = [];
+                foreach ($parts as $name) {
+                    $clean = trim(preg_replace('/\s+/', ' ', (string)$name));
+                    if ($clean !== '') {
+                        $name_list[] = $clean;
+                    }
+                }
+                $name_list = array_values(array_unique($name_list));
+
+                if (empty($name_list)) {
+                    echo json_encode(['success' => false, 'message' => 'No valid names found']);
+                    break;
+                }
+
+                // Get class details for defaults and capacity checks.
+                $stmt = $pdo->prepare("SELECT grade, capacity FROM classes WHERE id = ?");
+                $stmt->execute([$class_id]);
+                $class_row = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$class_row) {
+                    echo json_encode(['success' => false, 'message' => 'Class not found']);
+                    break;
+                }
+
+                $default_grade = trim((string)($class_row['grade'] ?? 'new'));
+                if ($default_grade === '') {
+                    $default_grade = 'new';
+                }
+                $capacity = isset($class_row['capacity']) ? (int)$class_row['capacity'] : 0;
+
+                $pdo->beginTransaction();
+                try {
+                    $currentCountStmt = $pdo->prepare("SELECT COUNT(*) FROM class_enrollments WHERE class_id = ? AND status = 'active'");
+                    $currentCountStmt->execute([$class_id]);
+                    $current_active_count = (int)$currentCountStmt->fetchColumn();
+
+                    $findByNameStmt = $pdo->prepare("
+                        SELECT id
+                        FROM students
+                        WHERE LOWER(TRIM(full_name)) = LOWER(TRIM(?))
+                        ORDER BY id DESC
+                        LIMIT 1
+                    ");
+                    $findEnrollmentStmt = $pdo->prepare("
+                        SELECT status
+                        FROM class_enrollments
+                        WHERE class_id = ? AND student_id = ?
+                        LIMIT 1
+                    ");
+                    $upsertEnrollmentStmt = $pdo->prepare("
+                        INSERT INTO class_enrollments (class_id, student_id, enrollment_date, status)
+                        VALUES (?, ?, CURDATE(), 'active')
+                        ON DUPLICATE KEY UPDATE status = 'active', enrollment_date = VALUES(enrollment_date)
+                    ");
+
+                    // Prefer insert with is_new_registration; fallback for older schemas.
+                    $insertStudentSqlA = "
+                        INSERT INTO students (
+                            full_name, christian_name, gender, birth_date, current_grade,
+                            has_spiritual_father, living_with, is_new_registration
+                        ) VALUES (?, ?, 'male', '0000-00-00', ?, 'none', 'both_parents', 1)
+                    ";
+                    $insertStudentSqlB = "
+                        INSERT INTO students (
+                            full_name, christian_name, gender, birth_date, current_grade,
+                            has_spiritual_father, living_with
+                        ) VALUES (?, ?, 'male', '0000-00-00', ?, 'none', 'both_parents')
+                    ";
+                    $insertStudentStmt = $pdo->prepare($insertStudentSqlA);
+                    $insertSupportsNewFlag = true;
+
+                    $created_count = 0;
+                    $existing_count = 0;
+                    $enrolled_count = 0;
+                    $already_enrolled_count = 0;
+                    $skipped_capacity_count = 0;
+                    $added_student_ids = [];
+
+                    foreach ($name_list as $full_name) {
+                        $findByNameStmt->execute([$full_name]);
+                        $student_id = (int)($findByNameStmt->fetchColumn() ?: 0);
+
+                        if ($student_id <= 0) {
+                            try {
+                                $insertStudentStmt->execute([$full_name, $full_name, $default_grade]);
+                            } catch (PDOException $e) {
+                                if ($insertSupportsNewFlag) {
+                                    $insertSupportsNewFlag = false;
+                                    $insertStudentStmt = $pdo->prepare($insertStudentSqlB);
+                                    $insertStudentStmt->execute([$full_name, $full_name, $default_grade]);
+                                } else {
+                                    throw $e;
+                                }
+                            }
+                            $student_id = (int)$pdo->lastInsertId();
+                            $created_count++;
+                        } else {
+                            $existing_count++;
+                        }
+
+                        if ($student_id <= 0) {
+                            continue;
+                        }
+
+                        $findEnrollmentStmt->execute([$class_id, $student_id]);
+                        $enroll_row = $findEnrollmentStmt->fetch(PDO::FETCH_ASSOC);
+                        $already_active = $enroll_row && strtolower((string)($enroll_row['status'] ?? '')) === 'active';
+                        if ($already_active) {
+                            $already_enrolled_count++;
+                            continue;
+                        }
+
+                        if ($capacity > 0 && $current_active_count >= $capacity) {
+                            $skipped_capacity_count++;
+                            continue;
+                        }
+
+                        $upsertEnrollmentStmt->execute([$class_id, $student_id]);
+                        $enrolled_count++;
+                        $current_active_count++;
+                        $added_student_ids[] = $student_id;
+                    }
+
+                    $pdo->commit();
+
+                    $message = "Quick add complete: {$enrolled_count} enrolled";
+                    if ($created_count > 0) {
+                        $message .= ", {$created_count} new";
+                    }
+                    if ($existing_count > 0) {
+                        $message .= ", {$existing_count} existing";
+                    }
+                    if ($already_enrolled_count > 0) {
+                        $message .= ", {$already_enrolled_count} already in class";
+                    }
+                    if ($skipped_capacity_count > 0) {
+                        $message .= ", {$skipped_capacity_count} skipped (capacity)";
+                    }
+
+                    echo json_encode([
+                        'success' => true,
+                        'message' => $message,
+                        'created_count' => $created_count,
+                        'existing_count' => $existing_count,
+                        'enrolled_count' => $enrolled_count,
+                        'already_enrolled_count' => $already_enrolled_count,
+                        'skipped_capacity_count' => $skipped_capacity_count,
+                        'student_ids' => $added_student_ids
+                    ]);
+                } catch (Exception $e) {
+                    $pdo->rollBack();
+                    echo json_encode(['success' => false, 'message' => 'Quick add failed: ' . $e->getMessage()]);
+                }
+                break;
                 
             case 'remove_student':
                 $class_id = (int)$_POST['class_id'];
@@ -287,6 +457,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $stmt->execute([$class_id, $student_id]);
                 
                 echo json_encode(['success' => true, 'message' => 'Student removed from class']);
+                break;
+
+            case 'move_student':
+                $class_id = (int)($_POST['class_id'] ?? 0);
+                $student_id = (int)($_POST['student_id'] ?? 0);
+
+                if ($class_id <= 0 || $student_id <= 0) {
+                    echo json_encode(['success' => false, 'message' => 'Invalid class or student']);
+                    break;
+                }
+
+                $pdo->beginTransaction();
+                try {
+                    // Validate target class and capacity.
+                    $stmt = $pdo->prepare("SELECT id, name, capacity FROM classes WHERE id = ?");
+                    $stmt->execute([$class_id]);
+                    $targetClass = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if (!$targetClass) {
+                        throw new Exception('Target class not found');
+                    }
+
+                    $stmt = $pdo->prepare("SELECT id FROM class_enrollments WHERE class_id = ? AND student_id = ? AND status = 'active' LIMIT 1");
+                    $stmt->execute([$class_id, $student_id]);
+                    $alreadyInTarget = (bool)$stmt->fetchColumn();
+
+                    if (!$alreadyInTarget && !empty($targetClass['capacity'])) {
+                        $stmt = $pdo->prepare("SELECT COUNT(*) FROM class_enrollments WHERE class_id = ? AND status = 'active'");
+                        $stmt->execute([$class_id]);
+                        $targetCount = (int)$stmt->fetchColumn();
+                        if ($targetCount >= (int)$targetClass['capacity']) {
+                            throw new Exception('Target class is already full');
+                        }
+                    }
+
+                    // Mark other active enrollments as transferred to keep one active class.
+                    $stmt = $pdo->prepare("UPDATE class_enrollments SET status = 'transferred' WHERE student_id = ? AND status = 'active' AND class_id <> ?");
+                    $stmt->execute([$student_id, $class_id]);
+
+                    // Activate enrollment in target class.
+                    $stmt = $pdo->prepare("
+                        INSERT INTO class_enrollments (class_id, student_id, enrollment_date, status)
+                        VALUES (?, ?, CURDATE(), 'active')
+                        ON DUPLICATE KEY UPDATE status = 'active', enrollment_date = VALUES(enrollment_date)
+                    ");
+                    $stmt->execute([$class_id, $student_id]);
+
+                    $pdo->commit();
+                    echo json_encode(['success' => true, 'message' => 'Student moved successfully']);
+                } catch (Exception $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                }
+                break;
+
+            case 'move_students_bulk':
+                $class_id = (int)($_POST['class_id'] ?? 0);
+                $student_ids = json_decode($_POST['student_ids'] ?? '[]', true) ?: [];
+                $student_ids = array_values(array_unique(array_map('intval', $student_ids)));
+                $student_ids = array_values(array_filter($student_ids, function($v){ return $v > 0; }));
+
+                if ($class_id <= 0 || empty($student_ids)) {
+                    echo json_encode(['success' => false, 'message' => 'Invalid class or students']);
+                    break;
+                }
+
+                $pdo->beginTransaction();
+                try {
+                    $stmt = $pdo->prepare("SELECT id, capacity FROM classes WHERE id = ?");
+                    $stmt->execute([$class_id]);
+                    $targetClass = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if (!$targetClass) {
+                        throw new Exception('Target class not found');
+                    }
+
+                    // Capacity check: count only students not already active in target.
+                    $placeholders = implode(',', array_fill(0, count($student_ids), '?'));
+                    $alreadySql = "SELECT student_id FROM class_enrollments WHERE class_id = ? AND status = 'active' AND student_id IN ($placeholders)";
+                    $stmt = $pdo->prepare($alreadySql);
+                    $stmt->execute(array_merge([$class_id], $student_ids));
+                    $alreadyActiveInTarget = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+                    $toActivate = array_diff($student_ids, $alreadyActiveInTarget);
+
+                    if (!empty($targetClass['capacity'])) {
+                        $stmt = $pdo->prepare("SELECT COUNT(*) FROM class_enrollments WHERE class_id = ? AND status = 'active'");
+                        $stmt->execute([$class_id]);
+                        $currentCount = (int)$stmt->fetchColumn();
+                        if ($currentCount + count($toActivate) > (int)$targetClass['capacity']) {
+                            throw new Exception('Target class capacity would be exceeded');
+                        }
+                    }
+
+                    $deactivateStmt = $pdo->prepare("UPDATE class_enrollments SET status = 'transferred' WHERE student_id = ? AND status = 'active' AND class_id <> ?");
+                    $upsertStmt = $pdo->prepare("
+                        INSERT INTO class_enrollments (class_id, student_id, enrollment_date, status)
+                        VALUES (?, ?, CURDATE(), 'active')
+                        ON DUPLICATE KEY UPDATE status = 'active', enrollment_date = VALUES(enrollment_date)
+                    ");
+
+                    $movedCount = 0;
+                    foreach ($student_ids as $sid) {
+                        $deactivateStmt->execute([$sid, $class_id]);
+                        $upsertStmt->execute([$class_id, $sid]);
+                        $movedCount++;
+                    }
+
+                    $pdo->commit();
+                    echo json_encode([
+                        'success' => true,
+                        'message' => $movedCount . ' students moved successfully',
+                        'moved_count' => $movedCount
+                    ]);
+                } catch (Exception $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                }
                 break;
                 
             case 'get_teachers':
@@ -1405,8 +1694,10 @@ ob_start();
 <?php
 $content = ob_get_clean();
 
-// Include the external JavaScript file
-$page_script = '<script src="js/classes.js"></script>';
+// Include external JS with cache-busting so latest changes appear immediately
+$classesJsPath = __DIR__ . '/js/classes.js';
+$classesJsVer = is_file($classesJsPath) ? filemtime($classesJsPath) : time();
+$page_script = '<script src="js/classes.js?v=' . $classesJsVer . '"></script>';
 
 // Now render the page using the admin layout
 echo renderAdminLayout($title, $content, $page_script);

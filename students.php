@@ -43,6 +43,174 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo json_encode(['success' => false, 'message' => 'Error fetching grades: ' . $e->getMessage()]);
             }
             exit;
+        case 'quick_add_meta':
+            try {
+                $classes = [];
+                try {
+                    $stmt = $pdo->query("SELECT id, name, grade, section FROM classes ORDER BY grade, section, name");
+                    $classes = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+                } catch (Exception $ignore) {
+                    $classes = [];
+                }
+                echo json_encode(['success' => true, 'classes' => $classes]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'message' => 'Meta load failed: ' . $e->getMessage()]);
+            }
+            exit;
+        case 'quick_add_student':
+            $full_name = trim((string)($_POST['full_name'] ?? ''));
+            $gender = strtolower(trim((string)($_POST['gender'] ?? '')));
+            $birth_date = trim((string)($_POST['birth_date'] ?? '')); // Ethiopian YYYY-MM-DD
+            $phone_number = trim((string)($_POST['phone_number'] ?? ''));
+            $class_id = (int)($_POST['class_id'] ?? 0);
+            $registration_type = strtolower(trim((string)($_POST['registration_type'] ?? 'student'))); // student | instrumental
+            $instrument = trim((string)($_POST['instrument'] ?? ''));
+
+            if ($full_name === '') {
+                echo json_encode(['success' => false, 'message' => 'Full name is required']);
+                exit;
+            }
+            if (!in_array($gender, ['male', 'female'], true)) {
+                echo json_encode(['success' => false, 'message' => 'Gender is required']);
+                exit;
+            }
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $birth_date)) {
+                echo json_encode(['success' => false, 'message' => 'Birth date must be Ethiopian YYYY-MM-DD']);
+                exit;
+            }
+            if (!in_array($registration_type, ['student', 'instrumental'], true)) {
+                $registration_type = 'student';
+            }
+            if ($registration_type === 'instrumental' && $instrument === '') {
+                echo json_encode(['success' => false, 'message' => 'Instrument type is required for instrumental registration']);
+                exit;
+            }
+
+            try {
+                $pdo->beginTransaction();
+
+                $class_grade = '';
+                if ($class_id > 0) {
+                    $stmt = $pdo->prepare("SELECT grade FROM classes WHERE id = ? LIMIT 1");
+                    $stmt->execute([$class_id]);
+                    $class_grade = (string)($stmt->fetchColumn() ?: '');
+                }
+
+                // Find existing student by normalized full name.
+                $stmt = $pdo->prepare("SELECT id, current_grade FROM students WHERE LOWER(TRIM(full_name)) = LOWER(TRIM(?)) LIMIT 1");
+                $stmt->execute([$full_name]);
+                $existing_student = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $student_id = 0;
+                $student_created = false;
+                if ($existing_student) {
+                    $student_id = (int)$existing_student['id'];
+                    // Light update of missing basics.
+                    $stmt = $pdo->prepare("UPDATE students SET gender = COALESCE(NULLIF(gender, ''), ?), phone_number = CASE WHEN phone_number IS NULL OR phone_number = '' THEN ? ELSE phone_number END WHERE id = ?");
+                    $stmt->execute([$gender, $phone_number, $student_id]);
+                } else {
+                    $target_grade = $class_grade !== '' ? $class_grade : 'new';
+                    $hasNewRegistrationCol = false;
+                    $dbName = (string)$pdo->query("SELECT DATABASE()")->fetchColumn();
+                    if ($dbName !== '') {
+                        $check = $pdo->prepare("SELECT 1 FROM information_schema.columns WHERE table_schema = ? AND table_name = 'students' AND column_name = 'is_new_registration' LIMIT 1");
+                        $check->execute([$dbName]);
+                        $hasNewRegistrationCol = (bool)$check->fetchColumn();
+                    }
+
+                    if ($hasNewRegistrationCol) {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO students (
+                                full_name, christian_name, gender, birth_date, phone_number, current_grade,
+                                has_spiritual_father, living_with, is_new_registration
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+                        ");
+                        $stmt->execute([$full_name, $full_name, $gender, $birth_date, $phone_number, $target_grade, 'none', 'both_parents']);
+                    } else {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO students (
+                                full_name, christian_name, gender, birth_date, phone_number, current_grade,
+                                has_spiritual_father, living_with
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        ");
+                        $stmt->execute([$full_name, $full_name, $gender, $birth_date, $phone_number, $target_grade, 'none', 'both_parents']);
+                    }
+                    $student_id = (int)$pdo->lastInsertId();
+                    $student_created = true;
+                }
+
+                // Optional class enrollment.
+                $enrolled_to_class = false;
+                if ($class_id > 0 && $student_id > 0) {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO class_enrollments (class_id, student_id, enrollment_date, status)
+                        VALUES (?, ?, CURDATE(), 'active')
+                        ON DUPLICATE KEY UPDATE status = 'active', enrollment_date = VALUES(enrollment_date)
+                    ");
+                    $stmt->execute([$class_id, $student_id]);
+                    $enrolled_to_class = true;
+                }
+
+                // Optional instrumental registration creation.
+                $instrument_created = false;
+                if ($registration_type === 'instrumental') {
+                    [$ey, $em, $ed] = array_map('intval', explode('-', $birth_date));
+
+                    $stmt = $pdo->prepare("SELECT id FROM instrument_registrations WHERE LOWER(TRIM(full_name)) = LOWER(TRIM(?)) AND instrument = ? LIMIT 1");
+                    $stmt->execute([$full_name, $instrument]);
+                    $already = (int)($stmt->fetchColumn() ?: 0);
+
+                    if (!$already) {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO instrument_registrations (
+                                instrument, full_name, christian_name, gender,
+                                birth_year_et, birth_month_et, birth_day_et,
+                                phone_number, person_photo_path, student_id, has_spiritual_father
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ");
+                        $stmt->execute([
+                            $instrument, $full_name, $full_name, $gender,
+                            (string)$ey, (string)$em, (string)$ed,
+                            $phone_number, '', $student_id, 'none'
+                        ]);
+                        $instrument_created = true;
+                    }
+                }
+
+                $pdo->commit();
+                cache_clear('students');
+                cache_clear('counts');
+
+                $stmt = $pdo->prepare("SELECT id, full_name, christian_name, gender, birth_date, phone_number, current_grade, photo_path, created_at FROM students WHERE id = ? LIMIT 1");
+                $stmt->execute([$student_id]);
+                $student_row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [
+                    'id' => $student_id,
+                    'full_name' => $full_name,
+                    'christian_name' => $full_name,
+                    'gender' => $gender,
+                    'birth_date' => $birth_date,
+                    'phone_number' => $phone_number,
+                    'current_grade' => $class_grade !== '' ? $class_grade : 'new',
+                    'photo_path' => '',
+                    'created_at' => date('Y-m-d H:i:s')
+                ];
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Student added successfully',
+                    'student_id' => $student_id,
+                    'student_created' => $student_created,
+                    'enrolled_to_class' => $enrolled_to_class,
+                    'instrument_created' => $instrument_created,
+                    'student' => $student_row
+                ]);
+            } catch (Exception $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                echo json_encode(['success' => false, 'message' => 'Quick add failed: ' . $e->getMessage()]);
+            }
+            exit;
         case 'delete_student':
             $student_id = (int)$_POST['student_id'];
             $table = $_POST['table'] ?? 'students';
@@ -50,12 +218,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 if ($table === 'instruments') {
                     $stmt = $pdo->prepare("DELETE FROM instrument_registrations WHERE id = ?");
+                    $result = $stmt->execute([$student_id]);
                 } else {
+                    // Ensure dependent links are cleaned for quick-added/enrolled students.
+                    $pdo->beginTransaction();
+                    $dbName = (string)$pdo->query("SELECT DATABASE()")->fetchColumn();
+                    $hasClassEnrollments = false;
+                    if ($dbName !== '') {
+                        $check = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = 'class_enrollments' LIMIT 1");
+                        $check->execute([$dbName]);
+                        $hasClassEnrollments = (bool)$check->fetchColumn();
+                    }
+                    if ($hasClassEnrollments) {
+                        $stmt = $pdo->prepare("DELETE FROM class_enrollments WHERE student_id = ?");
+                        $stmt->execute([$student_id]);
+                    }
                     $stmt = $pdo->prepare("DELETE FROM students WHERE id = ?");
+                    $result = $stmt->execute([$student_id]);
+                    $pdo->commit();
+                    // Invalidate list/count caches so deleted student disappears immediately.
+                    cache_clear('students');
+                    cache_clear('counts');
                 }
-                $result = $stmt->execute([$student_id]);
                 echo json_encode(['success' => $result, 'message' => $result ? 'Record deleted successfully' : 'Failed to delete record']);
             } catch (Exception $e) {
+                if ($table !== 'instruments' && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
                 echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
             }
             exit;
@@ -71,6 +260,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $stmt = $pdo->prepare("UPDATE students SET flagged = 1 - COALESCE(flagged, 0) WHERE id = ?");
                 }
                 $result = $stmt->execute([$student_id]);
+                if ($table !== 'instruments') {
+                    cache_clear('students');
+                    cache_clear('counts');
+                }
                 
                 // Get new flag status
                 if ($table === 'instruments') {
@@ -108,8 +301,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     case 'delete':
                         if ($table === 'instruments') {
                             $stmt = $pdo->prepare("DELETE FROM instrument_registrations WHERE id IN ($placeholders)");
+                            $result = $stmt->execute($ids);
                         } else {
+                            $pdo->beginTransaction();
+                            $dbName = (string)$pdo->query("SELECT DATABASE()")->fetchColumn();
+                            $hasClassEnrollments = false;
+                            if ($dbName !== '') {
+                                $check = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = 'class_enrollments' LIMIT 1");
+                                $check->execute([$dbName]);
+                                $hasClassEnrollments = (bool)$check->fetchColumn();
+                            }
+                            if ($hasClassEnrollments) {
+                                $stmt = $pdo->prepare("DELETE FROM class_enrollments WHERE student_id IN ($placeholders)");
+                                $stmt->execute($ids);
+                            }
                             $stmt = $pdo->prepare("DELETE FROM students WHERE id IN ($placeholders)");
+                            $result = $stmt->execute($ids);
+                            $pdo->commit();
+                            // Invalidate list/count caches so bulk delete is reflected instantly.
+                            cache_clear('students');
+                            cache_clear('counts');
                         }
                         break;
                     case 'flag':
@@ -131,12 +342,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         exit;
                 }
                 
-                $result = $stmt->execute($ids);
+                if (!isset($result)) {
+                    $result = $stmt->execute($ids);
+                }
+                if ($table !== 'instruments') {
+                    cache_clear('students');
+                    cache_clear('counts');
+                }
                 echo json_encode([
                     'success' => $result, 
                     'message' => $result ? 'Bulk action completed successfully' : 'Failed to complete bulk action'
                 ]);
             } catch (Exception $e) {
+                if ($table === 'students' && isset($bulk_action) && $bulk_action === 'delete' && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
                 echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
             }
             exit;
@@ -390,6 +610,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
                     $stmt->execute([$student_id]);
                     $updated_student = $stmt->fetch(PDO::FETCH_ASSOC);
+                    // Invalidate list/count caches after profile update.
+                    cache_clear('students');
+                    cache_clear('counts');
                     
                     echo json_encode([
                         'success' => true, 
@@ -411,29 +634,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 // Main page logic
 // Implement proper pagination
 if ($perfMonitor) $perfMonitor->checkpoint('start_processing');
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-// Determine Show All and page size BEFORE initial fetch
-$show_all_init = false;
-if (isset($_GET['show_all'])) {
-    $val = strtolower((string)$_GET['show_all']);
-    $show_all_init = ($val === '' || $val === 'true' || $val === '1' || $val === 'yes' || $val === 'on');
-}
-
-// Optional per_page param for paged mode
-$allowed_page_sizes = [10, 25, 50, 100];
-$per_page_param = (int)($_GET['per_page'] ?? 25);
-if (!in_array($per_page_param, $allowed_page_sizes, true)) { $per_page_param = 25; }
-
-if ($show_all_init) {
-    // Fetch all rows for initial dataset
-    $page = 1;
-    $total_all = (int)get_total_students_count($pdo);
-    $per_page = $total_all;
-} else {
-    $per_page = $per_page_param; // Paged mode
-}
-
-$all = fetch_all_students_with_parents($pdo, $page, $per_page);
 if ($perfMonitor) $perfMonitor->checkpoint('data_fetched');
 
 $view = $_GET['view'] ?? 'all'; // all | youth | under | instrument
@@ -446,12 +646,6 @@ $date_to = $_GET['date_to'] ?? '';
 
 // Compute total filtered count early for header badge (respects view, search, date filters)
 $total_records_count = get_filtered_students_count($pdo, $view, $search, $date_from, $date_to);
-
-$show_all_init = false;
-if (isset($_GET['show_all'])) {
-    $val = strtolower((string)$_GET['show_all']);
-    $show_all_init = ($val === 'true' || $val === '1' || $val === 'yes');
-}
 
 if ($view === 'instrument') {
     // Instrument type filter
@@ -589,31 +783,8 @@ if ($view === 'instrument') {
         $grouped_students[] = $primary_student;
     }
 } else {
-    // Regular student view with search
-    $students = ($view === 'all') ? $all : filter_students_by_age_group($all, $view === 'youth' ? 'youth' : 'under');
-    
-    // Apply search filter
-    if ($search) {
-        $students = array_filter($students, function($student) use ($search) {
-            return stripos($student['full_name'], $search) !== false || 
-                   stripos($student['christian_name'], $search) !== false ||
-                   stripos($student['phone_number'], $search) !== false;
-        });
-    }
-    
-    // Apply date filter
-    if ($date_from || $date_to) {
-        $students = array_filter($students, function($student) use ($date_from, $date_to) {
-            $created_date = $student['created_at'] ?? '';
-            if (!$created_date) return true;
-            
-            if ($date_from && $created_date < $date_from) return false;
-            if ($date_to && $created_date > ($date_to . ' 23:59:59')) return false;
-            return true;
-        });
-    }
-    
-    $grouped_students = $students; // For consistency with instrument view
+    // Non-instrument lists are fetched with DB-level filtering/pagination below.
+    $grouped_students = [];
 }
 
 $title = $view === 'youth' ? '18+ Students' : ($view === 'under' ? 'Under 18 Students' : ($view === 'instrument' ? 'Instrument Students' : 'All Students'));
@@ -720,7 +891,7 @@ ob_start();
             <h2 class="text-md sm:text-lg font-bold text-gray-900 dark:text-white flex items-center">
                 <i class="fas fa-<?= $view === 'instrument' ? 'music' : 'users' ?> mr-1.5 text-primary-600 dark:text-primary-400 text-xs"></i>
                 <span class="truncate max-w-xs sm:max-w-sm"><?= htmlspecialchars($title) ?></span>
-                <span class="ml-1.5 px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 rounded-full flex-shrink-0">
+                <span id="records-badge" class="ml-1.5 px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 rounded-full flex-shrink-0">
                     <?= number_format($total_records_count) ?> <?= ($total_records_count == 1) ? 'record' : 'records' ?>
                 </span>
             </h2>
@@ -741,10 +912,10 @@ ob_start();
                     <i class="fas fa-plus mr-1 text-xs"></i> New Registration
                 </a>
             <?php else: ?>
-                <a href="registration.php" 
+                <button type="button" onclick="openQuickAddStudentDrawer()" 
                    class="inline-flex items-center justify-center px-2.5 py-1.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-md text-xs font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 touch-target">
                     <i class="fas fa-user-plus mr-1 text-xs"></i> Add Student
-                </a>
+                </button>
             <?php endif; ?>
             
             <button type="button" onclick="showColumnCustomizer()" 
@@ -759,24 +930,6 @@ ob_start();
         </div>
     </div>
     
-    <!-- Real-time Search Bar -->
-    <div class="mt-4">
-        <div class="relative max-w-md">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i class="fas fa-search text-gray-400 text-sm"></i>
-            </div>
-            <input type="text" id="studentSearch" 
-                   class="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" 
-                   placeholder="Search students by name, phone, grade, location...">
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                <span id="searchCount" class="text-xs text-gray-400 hidden"></span>
-                <button type="button" id="clearSearch" class="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hidden" onclick="clearStudentSearch()">
-                    <i class="fas fa-times text-xs"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-    
     <!-- View Tabs - Enhanced Design -->
     <div class="mt-4">
         <div class="flex flex-wrap gap-0.5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 p-0.5 rounded-lg shadow-inner">
@@ -784,7 +937,7 @@ ob_start();
                class="px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 touch-target <?= $view==='all' ? 'bg-white dark:bg-gray-600 text-primary-600 dark:text-primary-400 shadow-md transform scale-105' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-gray-600/50' ?>">
                 <i class="fas fa-users mr-1 text-xs"></i> All
                 <?php if ($view !== 'all'): ?>
-                    <span class="ml-1 text-xs opacity-70">(<?= count(fetch_all_students_with_parents($pdo, 1, 10000)) ?>)</span>
+                    <span class="ml-1 text-xs opacity-70">(<?= number_format(get_total_students_count($pdo)) ?>)</span>
                 <?php endif; ?>
             </a>
             <a href="students.php?view=youth" 
@@ -802,6 +955,426 @@ ob_start();
         </div>
     </div>
 </div>
+
+<script>
+window.openQuickAddStudentDrawer = function() {
+    if (document.getElementById("quick-add-student-overlay")) return;
+    const overlay = document.createElement("div");
+    overlay.id = "quick-add-student-overlay";
+    overlay.className = "fixed inset-0 z-[70] bg-black/50";
+    overlay.innerHTML = `
+        <div class="absolute inset-y-0 right-0 w-full sm:w-[92%] md:w-[720px] bg-white dark:bg-gray-900 shadow-2xl border-l border-gray-200 dark:border-gray-700 overflow-y-auto">
+            <div class="sticky top-0 z-10 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Quick Add Student</h3>
+                    <button type="button" onclick="closeQuickAddStudentDrawer()" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Fast registration for student and optional instrumental record.</p>
+            </div>
+            <div class="p-4 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                        <input id="qa-full-name" type="text" class="w-full px-2.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white" placeholder="Student full name">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Gender</label>
+                        <select id="qa-gender" class="w-full px-2.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white">
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Birth Date (ET)</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <select id="qa-birth-year" class="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white">
+                                <option value="">Year</option>
+                            </select>
+                            <select id="qa-birth-month" class="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white">
+                                <option value="">Month</option>
+                            </select>
+                            <select id="qa-birth-day" class="w-full px-2 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white">
+                                <option value="">Day</option>
+                            </select>
+                        </div>
+                        <p id="qa-age-hint" class="mt-1 text-[11px] text-gray-500 dark:text-gray-400">Age group: -</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
+                        <input id="qa-phone" type="text" class="w-full px-2.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white" placeholder="09...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Registration Type</label>
+                        <select id="qa-registration-type" class="w-full px-2.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white">
+                            <option value="student">Regular Student</option>
+                            <option value="instrumental">Instrumental Registration</option>
+                        </select>
+                    </div>
+                    <div id="qa-instrument-wrap" class="hidden">
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Instrument</label>
+                        <select id="qa-instrument" class="w-full px-2.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white">
+                            <option value="">Select instrument</option>
+                            <option value="begena">Begena</option>
+                            <option value="masenqo">Masenqo</option>
+                            <option value="kebero">Kebero</option>
+                            <option value="krar">Krar</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Assign Class (Optional)</label>
+                        <select id="qa-class-id" class="w-full px-2.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-800 dark:text-white">
+                            <option value="">No class assignment</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-3">
+                    <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                        Need complete profile fields? use full forms:
+                        <a href="registration.php" class="text-blue-600 dark:text-blue-400 underline ml-1">Student Form</a>
+                        <a href="instrument_registration.php" class="text-blue-600 dark:text-blue-400 underline ml-2">Instrument Form</a>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="closeQuickAddStudentDrawer()" class="px-3 py-1.5 text-xs rounded bg-gray-600 hover:bg-gray-700 text-white">Cancel</button>
+                        <button id="qa-save-btn" type="button" onclick="submitQuickAddStudent()" class="px-3 py-1.5 text-xs rounded bg-primary-600 hover:bg-primary-700 text-white">Save Student</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    document.body.style.overflow = "hidden";
+
+    document.getElementById("qa-registration-type").addEventListener("change", function() {
+        const wrap = document.getElementById("qa-instrument-wrap");
+        if (!wrap) return;
+        if (this.value === "instrumental") wrap.classList.remove("hidden");
+        else wrap.classList.add("hidden");
+        updateQuickAddAgeHint();
+    });
+    initQuickAddEthiopianBirthSelectors();
+
+    loadQuickAddClasses();
+    const f = document.getElementById("qa-full-name");
+    if (f) f.focus();
+};
+
+window.closeQuickAddStudentDrawer = function() {
+    const overlay = document.getElementById("quick-add-student-overlay");
+    if (overlay) overlay.remove();
+    document.body.style.overflow = "";
+};
+
+function loadQuickAddClasses() {
+    const formData = new URLSearchParams();
+    formData.append("action", "quick_add_meta");
+    fetch(window.location.href, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: formData
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if (!data || !data.success) return;
+        const sel = document.getElementById("qa-class-id");
+        if (!sel) return;
+        const classes = Array.isArray(data.classes) ? data.classes : [];
+        classes.forEach(function(c){
+            const opt = document.createElement("option");
+            opt.value = String(c.id || "");
+            const sec = c.section ? (" - " + c.section) : "";
+            opt.textContent = (c.name || "Class") + " (Grade " + (c.grade || "-") + sec + ")";
+            sel.appendChild(opt);
+        });
+    })
+    .catch(function(){});
+}
+
+function updateQuickAddAgeHint() {
+    const birthDate = getQuickAddBirthDate();
+    const registrationType = ((document.getElementById("qa-registration-type") || {}).value || "student");
+    const hint = document.getElementById("qa-age-hint");
+    if (!hint) return;
+    const m = birthDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) {
+        hint.textContent = "Age group: -";
+        hint.className = "mt-1 text-[11px] text-gray-500 dark:text-gray-400";
+        return;
+    }
+    const ey = parseInt(m[1], 10);
+    const gy = new Date().getFullYear();
+    const currentEy = (new Date().getMonth() + 1 > 9) ? (gy - 7) : (gy - 8);
+    const age = currentEy - ey;
+    const bucket = age >= 17 ? "17+" : "Under 17";
+    hint.textContent = "Age group: " + bucket;
+    hint.className = "mt-1 text-[11px] " + (age >= 17 ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-400");
+    if (registrationType === "instrumental" && age < 17) {
+        hint.textContent += " (Instrumental usually 17+)";
+    }
+}
+
+function initQuickAddEthiopianBirthSelectors() {
+    const ySel = document.getElementById("qa-birth-year");
+    const mSel = document.getElementById("qa-birth-month");
+    const dSel = document.getElementById("qa-birth-day");
+    if (!ySel || !mSel || !dSel) return;
+
+    const gy = new Date().getFullYear();
+    const gm = new Date().getMonth() + 1;
+    const currentEy = gm > 9 ? gy - 7 : gy - 8;
+    const minEy = currentEy - 45;
+
+    ySel.innerHTML = '<option value="">Year</option>';
+    for (let y = currentEy; y >= minEy; y--) {
+        const opt = document.createElement("option");
+        opt.value = String(y);
+        opt.textContent = String(y);
+        ySel.appendChild(opt);
+    }
+
+    mSel.innerHTML = '<option value="">Month</option>';
+    for (let m = 1; m <= 13; m++) {
+        const opt = document.createElement("option");
+        opt.value = String(m);
+        opt.textContent = String(m);
+        mSel.appendChild(opt);
+    }
+
+    const updateDays = function() {
+        const year = parseInt(ySel.value || "0", 10);
+        const month = parseInt(mSel.value || "0", 10);
+        dSel.innerHTML = '<option value="">Day</option>';
+        if (!year || !month) return;
+        const leap = (year % 4) === 3;
+        const maxDays = month <= 12 ? 30 : (leap ? 6 : 5);
+        for (let d = 1; d <= maxDays; d++) {
+            const opt = document.createElement("option");
+            opt.value = String(d);
+            opt.textContent = String(d);
+            dSel.appendChild(opt);
+        }
+        updateQuickAddAgeHint();
+    };
+
+    ySel.addEventListener("change", updateDays);
+    mSel.addEventListener("change", updateDays);
+    dSel.addEventListener("change", updateQuickAddAgeHint);
+}
+
+function getQuickAddBirthDate() {
+    const y = ((document.getElementById("qa-birth-year") || {}).value || "").trim();
+    const m = ((document.getElementById("qa-birth-month") || {}).value || "").trim();
+    const d = ((document.getElementById("qa-birth-day") || {}).value || "").trim();
+    if (!y || !m || !d) return "";
+    return y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+}
+
+window.submitQuickAddStudent = function() {
+    const fullName = (document.getElementById("qa-full-name") || {}).value || "";
+    const gender = (document.getElementById("qa-gender") || {}).value || "";
+    const birthDate = getQuickAddBirthDate();
+    const phone = (document.getElementById("qa-phone") || {}).value || "";
+    const classId = (document.getElementById("qa-class-id") || {}).value || "";
+    const registrationType = (document.getElementById("qa-registration-type") || {}).value || "student";
+    const instrument = (document.getElementById("qa-instrument") || {}).value || "";
+    const saveBtn = document.getElementById("qa-save-btn");
+
+    if (!fullName.trim()) { alert("Full name is required"); return; }
+    if (!gender) { alert("Gender is required"); return; }
+    if (!birthDate || !/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) { alert("Please select Ethiopian birth year, month, and day"); return; }
+    if (registrationType === "instrumental" && !instrument) { alert("Instrument is required for instrumental registration"); return; }
+
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.classList.add("opacity-70", "cursor-not-allowed");
+        saveBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin mr-1\"></i>Saving...";
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("action", "quick_add_student");
+    formData.append("full_name", fullName.trim());
+    formData.append("gender", gender);
+    formData.append("birth_date", birthDate.trim());
+    formData.append("phone_number", phone.trim());
+    formData.append("class_id", classId);
+    formData.append("registration_type", registrationType);
+    formData.append("instrument", instrument);
+
+    fetch(window.location.href, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: formData
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if (data && data.success) {
+            closeQuickAddStudentDrawer();
+            handleQuickAddStudentSuccess(data);
+        } else {
+            alert((data && data.message) ? data.message : "Quick add failed");
+        }
+    })
+    .catch(function(){ alert("Network error"); })
+    .finally(function(){
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.classList.remove("opacity-70", "cursor-not-allowed");
+            saveBtn.textContent = "Save Student";
+        }
+    });
+};
+
+function handleQuickAddStudentSuccess(data) {
+    const student = data && data.student ? data.student : null;
+    if (!student || !student.id) {
+        location.reload();
+        return;
+    }
+
+    // If server-side search is active, a refresh is needed to preserve exact backend filtering.
+    const listingSearch = document.getElementById("students-table-search");
+    if (listingSearch && listingSearch.dataset && listingSearch.dataset.searchMode === "server") {
+        location.reload();
+        return;
+    }
+
+    // If there is an active client-side search term, don't guess placement.
+    if (listingSearch && String(listingSearch.value || "").trim() !== "") {
+        location.reload();
+        return;
+    }
+
+    // Respect current view bucket.
+    if (!quickAddStudentMatchesCurrentView(student, data)) {
+        updateRecordsBadgeCount(1);
+        if (typeof showToast === "function") showToast("Saved. It does not match current filter view.", "success");
+        return;
+    }
+
+    const inserted = insertQuickStudentRow(student, data);
+    if (!inserted) {
+        location.reload();
+        return;
+    }
+
+    updateRecordsBadgeCount(1);
+    if (typeof updateBulkUI === "function") updateBulkUI();
+    if (typeof showToast === "function") showToast("Student added successfully", "success");
+}
+
+function quickAddStudentMatchesCurrentView(student, data) {
+    const view = String(window.currentView || "all");
+    if (view === "instrument") {
+        return !!(data && data.instrument_created);
+    }
+    if (view === "all") return true;
+
+    const bd = String(student.birth_date || "");
+    const m = bd.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return false;
+    const ey = parseInt(m[1], 10);
+    const gy = new Date().getFullYear();
+    const currentEy = (new Date().getMonth() + 1 > 9) ? (gy - 7) : (gy - 8);
+    const age = currentEy - ey;
+    if (view === "youth") return age >= 17;
+    if (view === "under") return age < 17;
+    return true;
+}
+
+function insertQuickStudentRow(student, data) {
+    const tableBody = document.querySelector("#students-table-table-view tbody");
+    const cardsContainer = document.getElementById("students-table-cards-view");
+    if (!tableBody && !cardsContainer) return false;
+
+    if (tableBody) {
+        const headers = Array.from(document.querySelectorAll("#students-table-table-view thead th"));
+        const row = document.createElement("tr");
+        row.className = "student-record hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer";
+        row.setAttribute("data-student-id", String(student.id));
+        row.setAttribute("data-table-type", (window.currentView === "instrument") ? "instruments" : "students");
+        row.onclick = function() { viewComprehensiveStudentDetails(student.id, "students"); };
+
+        headers.forEach(function(th) {
+            const label = String(th.textContent || "").trim().toLowerCase();
+            const td = document.createElement("td");
+            td.className = "px-2 py-1.5 whitespace-nowrap text-xs";
+
+            if (label === "") {
+                td.innerHTML = '<input type="checkbox" class="rounded bulk-row-selector" data-id="' + String(student.id) + '" onclick="event.stopPropagation();">';
+            } else if (label.indexOf("photo") >= 0) {
+                const name = String(student.full_name || "U").trim();
+                const initials = name.split(/\s+/).filter(Boolean).slice(0,2).map(function(p){ return p[0].toUpperCase(); }).join("") || "U";
+                td.innerHTML = '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-medium text-xs ring-1 ring-primary-200 dark:ring-primary-700">' + initials + '</div>';
+            } else if (label.indexOf("full name") >= 0) {
+                td.innerHTML = '<div class="flex flex-col"><span class="font-medium text-gray-900 dark:text-white text-xs">' + escapeHtml(student.full_name || "-") + '</span></div>';
+            } else if (label.indexOf("christian") >= 0) {
+                td.textContent = student.christian_name || "-";
+            } else if (label.indexOf("gender") >= 0) {
+                td.textContent = student.gender || "-";
+            } else if (label.indexOf("birth") >= 0) {
+                td.textContent = student.birth_date || "-";
+            } else if (label.indexOf("grade") >= 0) {
+                td.textContent = student.current_grade || "-";
+            } else if (label.indexOf("phone") >= 0) {
+                td.textContent = student.phone_number || "-";
+            } else if (label.indexOf("register") >= 0) {
+                td.textContent = "Today";
+            } else if (label.indexOf("status") >= 0) {
+                td.innerHTML = '<span class="inline-flex items-center px-1 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-400 rounded">New</span>';
+            } else if (label.indexOf("action") >= 0) {
+                td.className = "px-2 py-1.5 whitespace-nowrap text-right text-xs";
+                td.innerHTML = `
+                    <div class="flex items-center justify-end space-x-0.5">
+                        <button onclick="viewComprehensiveStudentDetails(${student.id}, 'students'); event.stopPropagation();" class="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors touch-target" title="View Details"><i class="fas fa-eye text-xs"></i></button>
+                        <button onclick="editStudent(${student.id}, 'students'); event.stopPropagation();" class="p-1 text-green-600 hover:text-green-800 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors touch-target" title="Edit Student"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="deleteStudent(${student.id}, 'students'); event.stopPropagation();" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors touch-target" title="Delete Student"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
+                `;
+            } else {
+                td.textContent = "-";
+            }
+            row.appendChild(td);
+        });
+        tableBody.prepend(row);
+    }
+
+    if (cardsContainer) {
+        const card = document.createElement("div");
+        card.className = "student-record p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer";
+        card.setAttribute("data-student-id", String(student.id));
+        card.setAttribute("data-table-type", "students");
+        card.onclick = function() { viewComprehensiveStudentDetails(student.id, "students"); };
+        card.innerHTML = `
+            <div class="space-y-2">
+                <div class="grid grid-cols-1 gap-1">
+                    <div class="text-sm font-semibold text-gray-900 dark:text-white">${escapeHtml(student.full_name || "-")}</div>
+                    <div class="text-xs text-gray-600 dark:text-gray-400"><span class="text-xs text-gray-500 uppercase tracking-wide">Grade:</span><span class="ml-1">${escapeHtml(student.current_grade || "-")}</span></div>
+                    <div class="text-xs text-gray-600 dark:text-gray-400"><span class="text-xs text-gray-500 uppercase tracking-wide">Phone:</span><span class="ml-1">${escapeHtml(student.phone_number || "-")}</span></div>
+                </div>
+                <div class="flex items-center justify-end space-x-0.5 pt-1 border-t border-gray-100 dark:border-gray-600">
+                    <button onclick="viewComprehensiveStudentDetails(${student.id}, 'students'); event.stopPropagation();" class="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors touch-target" title="View Details"><i class="fas fa-eye text-xs"></i></button>
+                    <button onclick="editStudent(${student.id}, 'students'); event.stopPropagation();" class="p-1 text-green-600 hover:text-green-800 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors touch-target" title="Edit Student"><i class="fas fa-edit text-xs"></i></button>
+                    <button onclick="deleteStudent(${student.id}, 'students'); event.stopPropagation();" class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors touch-target" title="Delete Student"><i class="fas fa-trash text-xs"></i></button>
+                </div>
+            </div>
+        `;
+        cardsContainer.prepend(card);
+    }
+
+    return true;
+}
+
+function escapeHtml(str) {
+    return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+</script>
 
 
 
@@ -829,8 +1402,17 @@ $table_config = [
 
 // Custom render functions for specific columns
 $render_functions = [
+    'checkbox' => function($value, $row) {
+        $recordId = (int)($row['registration_id'] ?? $row['id'] ?? 0);
+        if ($recordId <= 0) {
+            return '';
+        }
+        return '<input type="checkbox" class="rounded bulk-row-selector" data-id="' . $recordId . '" onclick="event.stopPropagation();">';
+    },
+
     'photo_path' => function($value, $row) {
-        // Try multiple photo path sources
+        // Fast path: avoid filesystem checks for each row on large datasets.
+        // Browsers handle missing images; we provide initials fallback when empty.
         $photo_candidates = [
             $row['photo_path'] ?? '',           // Student table photo
             $row['person_photo_path'] ?? '',    // Instrument registration photo
@@ -840,20 +1422,8 @@ $render_functions = [
         $photo_path = '';
         foreach ($photo_candidates as $candidate) {
             if (!empty($candidate)) {
-                // Check if file exists with different possible paths
-                $possible_paths = [
-                    $candidate,
-                    'uploads/' . basename($candidate),
-                    'uploads/photos/' . basename($candidate),
-                    'photos/' . basename($candidate)
-                ];
-                
-                foreach ($possible_paths as $path) {
-                    if (file_exists($path)) {
-                        $photo_path = $path;
-                        break 2; // Break out of both loops
-                    }
-                }
+                $photo_path = (string)$candidate;
+                break;
             }
         }
         
@@ -1151,10 +1721,9 @@ if (!$show_all && $total_records > 0 && $per_page >= $total_records) {
     $total_pages = 1;
 }
 
-// For show_all, we still need to limit to prevent memory issues
-if ($show_all && $total_records > 1000) {
-    $per_page_init = get_total_students_count($pdo);
-    $per_page = (int)$per_page_init;
+// Show-all should render the full filtered set.
+if ($show_all) {
+    $per_page = max(1, (int)$total_records);
     $total_pages = 1;
     $page = 1;
 }
@@ -1170,9 +1739,29 @@ if ($view === 'instrument') {
 // Map options for renderMobileTable
 $table_options = $table_config;
 $table_options['show_pagination'] = !$show_all;
+$table_options['show_filters'] = false;
+$table_options['search_placeholder'] = 'Search students by name...';
+$table_options['search_value'] = (string)$search;
+$table_options['render_mode'] = ($show_all && $total_records >= 1200) ? 'cards' : 'both';
+$table_options['show_view_toggle'] = ($table_options['render_mode'] === 'both');
+$table_options['search_mode'] = ($show_all && $total_records >= 1200) ? 'server' : 'client';
 $table_options['per_page'] = $per_page;
 $table_options['current_page'] = $page;
 $table_options['total_records'] = $total_records;
+$table_options['header_actions_html'] = '
+    <div id="bulk-actions-bar" class="flex items-center flex-wrap gap-1">
+        <label class="inline-flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300 px-1.5">
+            <input type="checkbox" id="bulk-select-all" class="rounded">
+            <span>Select</span>
+        </label>
+        <span class="text-xs text-gray-700 dark:text-gray-300 px-1">
+            <span id="bulk-selected-count" class="font-semibold">0</span>
+        </span>
+        <button id="bulk-flag-btn" type="button" onclick="bulkApplyAction(\'flag\')" class="px-2 py-1 text-[11px] rounded bg-yellow-600 hover:bg-yellow-700 text-white disabled:opacity-50" disabled>Flag</button>
+        <button id="bulk-unflag-btn" type="button" onclick="bulkApplyAction(\'unflag\')" class="px-2 py-1 text-[11px] rounded bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50" disabled>Unflag</button>
+        <button id="bulk-delete-btn" type="button" onclick="bulkApplyAction(\'delete\')" class="px-2 py-1 text-[11px] rounded bg-red-600 hover:bg-red-700 text-white disabled:opacity-50" disabled>Delete</button>
+        <button type="button" onclick="clearBulkSelection()" class="px-2 py-1 text-[11px] rounded bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200">Clear</button>
+    </div>';
 
 echo renderMobileTable(
     $paginated_students,
@@ -1376,7 +1965,7 @@ $content = ob_get_clean();
 
 // Define page script - much cleaner without embedded PHP in JS
 $page_script = '
-<script src="js/enhanced-edit-drawer.js?v=2"></script>
+<script src="js/enhanced-edit-drawer.js?v=3"></script>
 <script src="js/instrument-edit-drawer.js?v=1"></script>
 <script src="js/column-customizer.js"></script>
 <script src="js/ethiopian-calendar-filter.js"></script>
@@ -1540,13 +2129,120 @@ window.deleteStudent = function(studentId, table){
     .then(r => r.json())
     .then(data => { 
         if (data && data.success) { 
-            location.reload(); 
+            if (!removeDeletedStudentFromUI(studentId, table)) {
+                location.reload();
+            }
         } else { 
             alert((data&&data.message)||"Delete failed"); 
         } 
     })
     .catch(() => alert("Network error"))
     .finally(() => hideLoadingOverlay());
+};
+
+function removeDeletedStudentFromUI(studentId, table) {
+    const selector = ".student-record[data-student-id=\"" + String(studentId) + "\"][data-table-type=\"" + String(table) + "\"]";
+    const items = document.querySelectorAll(selector);
+    if (!items.length) return false;
+
+    items.forEach(el => el.remove());
+    updateRecordsBadgeCount(-1);
+
+    const hasAny = document.querySelectorAll(".student-record[data-table-type=\"" + String(table) + "\"]").length > 0;
+    if (!hasAny) {
+        // Last visible record removed: refresh once to get proper empty-state/pagination.
+        location.reload();
+    }
+    return true;
+}
+
+function updateRecordsBadgeCount(delta) {
+    const badge = document.getElementById("records-badge");
+    if (!badge) return;
+    const txt = badge.textContent || "";
+    const m = txt.match(/(\d[\d,]*)/);
+    if (!m) return;
+    const current = parseInt(m[1].replace(/,/g, ""), 10);
+    if (Number.isNaN(current)) return;
+    const next = Math.max(0, current + delta);
+    badge.textContent = next.toLocaleString() + " " + (next === 1 ? "record" : "records");
+}
+
+function getBulkSelectedIds() {
+    return Array.from(document.querySelectorAll(".bulk-row-selector:checked"))
+        .map(function(cb){ return parseInt(cb.getAttribute("data-id"), 10); })
+        .filter(function(v){ return !Number.isNaN(v) && v > 0; });
+}
+
+function updateBulkUI() {
+    const selectedIds = getBulkSelectedIds();
+    const selectedCountEl = document.getElementById("bulk-selected-count");
+    const selectAll = document.getElementById("bulk-select-all");
+    const flagBtn = document.getElementById("bulk-flag-btn");
+    const unflagBtn = document.getElementById("bulk-unflag-btn");
+    const deleteBtn = document.getElementById("bulk-delete-btn");
+    const allVisible = Array.from(document.querySelectorAll(".bulk-row-selector")).filter(function(cb){
+        return cb.offsetParent !== null && !cb.disabled;
+    });
+    const selectedVisible = allVisible.filter(function(cb){ return cb.checked; });
+
+    if (selectedCountEl) selectedCountEl.textContent = String(selectedIds.length);
+    if (flagBtn) flagBtn.disabled = selectedIds.length === 0;
+    if (unflagBtn) unflagBtn.disabled = selectedIds.length === 0;
+    if (deleteBtn) deleteBtn.disabled = selectedIds.length === 0;
+    if (selectAll) {
+        selectAll.checked = allVisible.length > 0 && selectedVisible.length === allVisible.length;
+        selectAll.indeterminate = selectedVisible.length > 0 && selectedVisible.length < allVisible.length;
+    }
+}
+
+window.clearBulkSelection = function() {
+    document.querySelectorAll(".bulk-row-selector:checked").forEach(function(cb){ cb.checked = false; });
+    const selectAll = document.getElementById("bulk-select-all");
+    if (selectAll) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+    }
+    updateBulkUI();
+};
+
+window.bulkApplyAction = function(actionName) {
+    const ids = getBulkSelectedIds();
+    if (!ids.length) {
+        alert("Please select at least one record");
+        return;
+    }
+
+    if (actionName === "delete" && !confirm("Delete selected records?")) {
+        return;
+    }
+
+    showLoadingOverlay();
+    const formData = new FormData();
+    formData.append("action", "bulk_action");
+    formData.append("bulk_action", actionName);
+    formData.append("table", window.currentTable || "students");
+    ids.forEach(function(id){ formData.append("ids[]", String(id)); });
+
+    fetch(window.location.href, {
+        method: "POST",
+        body: formData
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        if (data && data.success) {
+            if (actionName === "delete") {
+                location.reload();
+                return;
+            }
+            clearBulkSelection();
+            location.reload();
+        } else {
+            alert((data && data.message) || "Bulk action failed");
+        }
+    })
+    .catch(function(){ alert("Network error"); })
+    .finally(function(){ hideLoadingOverlay(); });
 };
 
 // UX helpers: loading overlay
@@ -1586,6 +2282,25 @@ window.closeModal = function(event){
 
 // Debounced search submit
 document.addEventListener("DOMContentLoaded", function(){
+    const selectAll = document.getElementById("bulk-select-all");
+    if (selectAll) {
+        selectAll.addEventListener("change", function() {
+            const shouldCheck = this.checked;
+            Array.from(document.querySelectorAll(".bulk-row-selector")).forEach(function(cb){
+                if (cb.disabled || cb.offsetParent === null) return;
+                cb.checked = shouldCheck;
+            });
+            updateBulkUI();
+        });
+    }
+    document.addEventListener("change", function(e){
+        if (e.target && e.target.classList && e.target.classList.contains("bulk-row-selector")) {
+            updateBulkUI();
+        }
+    });
+    document.addEventListener("mobileTableFiltered", function(){ updateBulkUI(); });
+    updateBulkUI();
+
     const searchInput = document.getElementById("search");
     if (searchInput) {
         let debounceTimer;
@@ -1679,6 +2394,7 @@ document.addEventListener("DOMContentLoaded", function(){
                     noResultsRow.style.display = "none";
                 }
             }
+            updateBulkUI();
         });
         
         // Focus search on Ctrl+F or Cmd+F

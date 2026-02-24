@@ -931,9 +931,18 @@ function openAssignStudentsModal(classId) {
                         <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Enter number of students to automatically select</p>
                     </div>
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Selected Students</label>
-                        <div class="px-2.5 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 rounded-md">
-                            <span id="selected-count" class="font-medium">0</span> students selected
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300">Selected Students</label>
+                            <button type="button" onclick="openQuickAddModal(${classId})" class="px-2 py-1 text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white rounded">
+                                Quick add
+                            </button>
+                        </div>
+                        <div class="px-2.5 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-between">
+                            <span>
+                                <span id="selected-count" class="font-medium">0</span> selected
+                                (<span id="assign-count" class="font-medium">0</span> assign,
+                                <span id="move-count" class="font-medium">0</span> move)
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -971,6 +980,7 @@ function openAssignStudentsModal(classId) {
                 
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeAssignStudentsModal()" class="px-3 py-1.5 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded-md">Cancel</button>
+                    <button type="button" onclick="moveSelectedStudents(${classId})" class="px-3 py-1.5 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded-md">Move Selected</button>
                     <button type="button" onclick="assignSelectedStudents(${classId})" class="px-3 py-1.5 text-xs bg-primary-600 hover:bg-primary-700 text-white rounded-md">Assign Selected</button>
                 </div>
             </div>
@@ -1059,7 +1069,6 @@ function loadAvailableStudents(classId) {
                 const inThisClass = Number(student.current_class_id || 0) === Number(classId);
                 const inAnotherClass = !!student.current_class_id && !inThisClass;
                 const status = inThisClass ? 'Enrolled' : (inAnotherClass ? 'Assigned' : 'Available');
-                const disabled = (inThisClass || inAnotherClass) ? "disabled" : "";
                 const isNew = Number(student.is_new_registration || 0) === 1;
                 const isFlagged = Number(student.is_flagged || 0) === 1;
                 // Styling: de-emphasize non-available, highlight NEW
@@ -1068,11 +1077,19 @@ function loadAvailableStudents(classId) {
                     ? 'bg-blue-100 text-blue-700'
                     : (inAnotherClass ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700');
                 const statusHint = inAnotherClass && student.current_class_name ? `title="Currently in: ${student.current_class_name}"` : '';
+                const safeClassName = String(student.current_class_name || '')
+                    .replace(/\\/g, '\\\\')
+                    .replace(/'/g, "\\'");
+                const moveButton = inAnotherClass
+                    ? `<button type="button" onclick="moveStudentToClass(${student.id}, ${classId}, '${safeClassName}'); event.stopPropagation();" class="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-600 hover:bg-amber-700 text-white text-[10px] leading-none">Move here</button>`
+                    : '';
+                const checkboxClass = inAnotherClass ? 'move-checkbox' : 'student-checkbox';
+                const disabled = inThisClass ? "disabled" : "";
 
                 html += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 ${rowClass}">
                         <td class="px-2 py-1">
-                            <input type="checkbox" class="rounded student-checkbox" data-id="${student.id}" ${disabled}>
+                            <input type="checkbox" class="rounded ${checkboxClass}" data-id="${student.id}" ${disabled}>
                         </td>
                         <td class="px-2 py-1 font-medium text-gray-900 dark:text-white text-xs">
                             ${isNew ? '<span class="mr-1 inline-block align-middle w-2 h-2 rounded-full bg-amber-600" title="New"></span>' : ''}
@@ -1083,9 +1100,12 @@ function loadAvailableStudents(classId) {
                         <td class="px-2 py-1 text-gray-500 dark:text-gray-400 text-xs">${student.phone_number || "-"}</td>
                         <td class="px-2 py-1 text-xs">
                             <div class="flex flex-col">
-                                <span ${statusHint} class="inline-flex w-fit items-center px-2 py-0.5 rounded-full ${statusClass}">
-                                    ${status}
-                                </span>
+                                <div class="inline-flex items-center gap-1">
+                                    <span ${statusHint} class="inline-flex w-fit items-center px-2 py-0.5 rounded-full ${statusClass}">
+                                        ${status}
+                                    </span>
+                                    ${moveButton}
+                                </div>
                                 ${inThisClass ? `<span class="mt-0.5 text-[10px] text-gray-500">(this class)</span>` : ''}
                                 ${inAnotherClass && student.current_class_name ? `<span class="mt-0.5 text-[10px] text-gray-500">${student.current_class_name}</span>` : ''}
                             </div>
@@ -1104,6 +1124,9 @@ function loadAvailableStudents(classId) {
             document.querySelectorAll('.student-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', updateSelectedCount);
             });
+            document.querySelectorAll('.move-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedCount);
+            });
         } else {
             document.getElementById("students-list").innerHTML = `<tr><td colspan="5" class="text-center text-red-500 text-sm py-4">Error loading students</td></tr>`;
         }
@@ -1113,10 +1136,46 @@ function loadAvailableStudents(classId) {
     });
 }
 
+function moveStudentToClass(studentId, targetClassId, fromClassName) {
+    const fromName = String(fromClassName || 'another class');
+    if (!confirm(`Move this student from "${fromName}" to this class?`)) return;
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'move_student');
+    formData.append('class_id', targetClassId);
+    formData.append('student_id', studentId);
+
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadAvailableStudents(targetClassId);
+            viewClassDetails(targetClassId);
+            loadClasses();
+            alert(data.message || 'Student moved successfully');
+        } else {
+            alert('Error: ' + (data.message || 'Failed to move student'));
+        }
+    })
+    .catch(() => {
+        alert('Network error');
+    });
+}
+
 // Update selected count
 function updateSelectedCount() {
-    const selectedCount = document.querySelectorAll('.student-checkbox:checked').length;
+    const assignCount = document.querySelectorAll('.student-checkbox:checked').length;
+    const moveCount = document.querySelectorAll('.move-checkbox:checked').length;
+    const selectedCount = assignCount + moveCount;
     document.getElementById('selected-count').textContent = selectedCount;
+    const assignEl = document.getElementById('assign-count');
+    const moveEl = document.getElementById('move-count');
+    if (assignEl) assignEl.textContent = assignCount;
+    if (moveEl) moveEl.textContent = moveCount;
 }
 
 // Auto select students
@@ -1146,6 +1205,113 @@ function autoSelectStudents() {
     
     // Update select all checkbox
     document.getElementById('select-all').checked = (count === checkboxes.length);
+}
+
+function openQuickAddModal(classId) {
+    const existing = document.getElementById('quick-add-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'quick-add-modal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-[60]';
+    modal.innerHTML = `
+        <div class="relative top-12 mx-auto p-3 border w-[92%] sm:w-[84%] md:w-[60%] lg:w-[42%] xl:w-[36%] shadow-lg rounded-md bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Quick Add Students</h3>
+                <button type="button" onclick="closeQuickAddModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <div class="pt-3">
+                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Full names</label>
+                <textarea id="quick-add-modal-names" rows="5" placeholder="One full name per line, or comma separated" class="w-full px-2.5 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:text-white"></textarea>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Students are auto-enrolled to this class.</p>
+                <div class="mt-3 flex justify-end gap-2">
+                    <button id="quick-add-cancel-btn" type="button" onclick="closeQuickAddModal()" class="px-3 py-1.5 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded-md">Cancel</button>
+                    <button id="quick-add-submit-btn" type="button" onclick="submitQuickAddStudents(${classId})" class="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Add now</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    const input = document.getElementById('quick-add-modal-names');
+    if (input) input.focus();
+}
+
+function closeQuickAddModal() {
+    const modal = document.getElementById('quick-add-modal');
+    if (modal) modal.remove();
+}
+
+function submitQuickAddStudents(classId) {
+    const namesInput = document.getElementById('quick-add-modal-names');
+    const submitBtn = document.getElementById('quick-add-submit-btn');
+    const cancelBtn = document.getElementById('quick-add-cancel-btn');
+    if (!namesInput) return;
+
+    const fullNames = (namesInput.value || '').trim();
+    if (!fullNames) {
+        alert('Please enter at least one full name');
+        return;
+    }
+
+    if (submitBtn && submitBtn.disabled) {
+        return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Saving...';
+    }
+    if (cancelBtn) {
+        cancelBtn.disabled = true;
+        cancelBtn.classList.add('opacity-70', 'cursor-not-allowed');
+    }
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'quick_add_students');
+    formData.append('class_id', classId);
+    formData.append('full_names', fullNames);
+
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            namesInput.value = '';
+            closeQuickAddModal();
+            loadAvailableStudents(classId);
+            loadClasses();
+            alert(data.message);
+        } else {
+            alert('Error: ' + data.message);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                submitBtn.innerHTML = 'Add now';
+            }
+            if (cancelBtn) {
+                cancelBtn.disabled = false;
+                cancelBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        }
+    })
+    .catch(() => {
+        alert('Network error');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            submitBtn.innerHTML = 'Add now';
+        }
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+            cancelBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+    });
 }
 
 // Close assign students modal
@@ -1185,6 +1351,43 @@ function assignSelectedStudents(classId) {
         }
     })
     .catch(error => {
+        alert("Network error");
+    });
+}
+
+function moveSelectedStudents(classId) {
+    const selectedCheckboxes = document.querySelectorAll(".move-checkbox:checked");
+    const studentIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.getAttribute("data-id"), 10)).filter(Boolean);
+
+    if (studentIds.length === 0) {
+        alert("Please select at least one assigned student to move");
+        return;
+    }
+
+    if (!confirm("Move selected students to this class?")) return;
+
+    const formData = new URLSearchParams();
+    formData.append("action", "move_students_bulk");
+    formData.append("class_id", classId);
+    formData.append("student_ids", JSON.stringify(studentIds));
+
+    fetch(window.location.href, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadAvailableStudents(classId);
+            viewClassDetails(classId);
+            loadClasses();
+            alert(data.message || "Students moved successfully");
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(() => {
         alert("Network error");
     });
 }

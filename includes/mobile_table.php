@@ -10,6 +10,13 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
         'show_pagination' => true,
         'show_search' => true,
         'show_filters' => true,
+        'show_view_toggle' => true,
+        'render_mode' => 'both', // both | table | cards
+        'search_mode' => 'client', // client | server
+        'search_param' => 'search',
+        'search_value' => '',
+        'search_placeholder' => 'Search records...',
+        'header_actions_html' => '',
         'actions' => [],
         'per_page' => 20,
         'current_page' => 1,
@@ -23,7 +30,7 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
     ob_start();
     ?>
     
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div id="<?= $options['table_id'] ?>-container" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <!-- Table Header with Search and Filters -->
         <?php if ($options['show_search'] || $options['show_filters']): ?>
         <div class="p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
@@ -36,13 +43,18 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
                     </div>
                     <input type="text" 
                            id="<?= $options['table_id'] ?>-search"
+                           data-search-mode="<?= htmlspecialchars((string)$options['search_mode']) ?>"
                            class="block w-full pl-8 pr-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-xs"
-                           placeholder="Search records...">
+                           value="<?= htmlspecialchars((string)$options['search_value']) ?>"
+                           placeholder="<?= htmlspecialchars($options['search_placeholder']) ?>">
                 </div>
                 <?php endif; ?>
                 
                 <!-- Filters and Actions -->
                 <div class="flex items-center space-x-1">
+                    <?php if (!empty($options['header_actions_html'])): ?>
+                    <?= $options['header_actions_html'] ?>
+                    <?php endif; ?>
                     <?php if ($options['show_filters']): ?>
                     <button class="inline-flex items-center px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-primary-500">
                         <i class="fas fa-filter mr-1 text-xs"></i>
@@ -51,24 +63,30 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
                     <?php endif; ?>
                     
                     <!-- View Toggle -->
+                    <?php if ($options['show_view_toggle']): ?>
                     <div class="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
                         <button onclick="toggleTableView('<?= $options['table_id'] ?>', 'table')" 
                                 class="view-toggle px-2 py-1 text-xs bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-r border-gray-300 dark:border-gray-600"
+                                data-table-id="<?= $options['table_id'] ?>"
                                 data-view="table">
                             <i class="fas fa-table text-xs"></i>
                         </button>
                         <button onclick="toggleTableView('<?= $options['table_id'] ?>', 'cards')" 
                                 class="view-toggle px-2 py-1 text-xs bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                data-table-id="<?= $options['table_id'] ?>"
                                 data-view="cards">
                             <i class="fas fa-th-large text-xs"></i>
                         </button>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
         <?php endif; ?>
         
+        <?php $renderMode = strtolower((string)($options['render_mode'] ?? 'both')); ?>
         <!-- Desktop Table View -->
+        <?php if ($renderMode === 'both' || $renderMode === 'table'): ?>
         <div id="<?= $options['table_id'] ?>-table-view" class="hidden lg:block overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700">
@@ -106,7 +124,9 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
                     </tr>
                     <?php else: ?>
                     <?php foreach ($data as $row): ?>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" 
+                    <tr class="student-record hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        data-student-id="<?= $row['registration_id'] ?? $row['id'] ?? 0 ?>"
+                        data-table-type="<?= (strpos($_SERVER['REQUEST_URI'], 'view=instrument') !== false) ? 'instruments' : 'students' ?>"
                         onclick="<?= (strpos($_SERVER['REQUEST_URI'], 'view=instrument') !== false) ? 'viewStudentDetails' : 'viewComprehensiveStudentDetails' ?>(<?= $row['registration_id'] ?? $row['id'] ?? 0 ?>, '<?= (strpos($_SERVER['REQUEST_URI'], 'view=instrument') !== false) ? 'instruments' : 'students' ?>')">
                         <?php foreach ($columns as $key => $column): ?>
                         <td class="px-2 py-1.5 whitespace-nowrap text-xs">
@@ -154,8 +174,10 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
                 </tbody>
             </table>
         </div>
+        <?php endif; ?>
         
         <!-- Mobile Cards View -->
+        <?php if ($renderMode === 'both' || $renderMode === 'cards'): ?>
         <div id="<?= $options['table_id'] ?>-cards-view" class="lg:hidden divide-y divide-gray-200 dark:divide-gray-700">
             <?php if (empty($data)): ?>
             <div class="p-12 text-center text-gray-500 dark:text-gray-400">
@@ -166,7 +188,9 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
             </div>
             <?php else: ?>
             <?php foreach ($data as $row): ?>
-            <div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" 
+            <div class="student-record p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                 data-student-id="<?= $row['registration_id'] ?? $row['id'] ?? 0 ?>"
+                 data-table-type="<?= (strpos($_SERVER['REQUEST_URI'], 'view=instrument') !== false) ? 'instruments' : 'students' ?>"
                  onclick="<?= (strpos($_SERVER['REQUEST_URI'], 'view=instrument') !== false) ? 'viewStudentDetails' : 'viewComprehensiveStudentDetails' ?>(<?= $row['registration_id'] ?? $row['id'] ?? 0 ?>, '<?= (strpos($_SERVER['REQUEST_URI'], 'view=instrument') !== false) ? 'instruments' : 'students' ?>')">
                 <div class="space-y-2">
                     <!-- Main content -->
@@ -223,6 +247,7 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
             <?php endforeach; ?>
             <?php endif; ?>
         </div>
+        <?php endif; ?>
         
         <!-- Pagination -->
         <?php if ($options['show_pagination'] && $options['total_records'] > $options['per_page']): ?>
@@ -251,15 +276,15 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
     function toggleTableView(tableId, view) {
         const tableView = document.getElementById(tableId + '-table-view');
         const cardsView = document.getElementById(tableId + '-cards-view');
-        const toggleButtons = document.querySelectorAll('[data-view]');
+        const toggleButtons = document.querySelectorAll('[data-table-id="' + tableId + '"][data-view]');
         
         // Update views
         if (view === 'table') {
-            tableView.classList.remove('hidden');
-            cardsView.classList.add('hidden');
+            if (tableView) tableView.classList.remove('hidden');
+            if (cardsView) cardsView.classList.add('hidden');
         } else {
-            tableView.classList.add('hidden');
-            cardsView.classList.remove('hidden');
+            if (tableView) tableView.classList.add('hidden');
+            if (cardsView) cardsView.classList.remove('hidden');
         }
         
         // Update button states
@@ -276,14 +301,129 @@ function renderMobileTable($data, $columns, $options = [], $render_functions = [
         // Save preference
         localStorage.setItem('table-view-' + tableId, view);
     }
+
+    function initMobileTableSearch(tableId) {
+        const searchInput = document.getElementById(tableId + '-search');
+        if (!searchInput) return;
+        const searchMode = '<?= htmlspecialchars((string)$options['search_mode']) ?>';
+        const searchParam = '<?= htmlspecialchars((string)$options['search_param']) ?>' || 'search';
+
+        if (searchMode === 'server') {
+            let serverDebounce = null;
+            searchInput.addEventListener('input', function() {
+                if (serverDebounce) clearTimeout(serverDebounce);
+                serverDebounce = setTimeout(function() {
+                    const query = (searchInput.value || '').trim();
+                    const url = new URL(window.location.href);
+                    if (query) url.searchParams.set(searchParam, query);
+                    else url.searchParams.delete(searchParam);
+                    url.searchParams.set('page', '1');
+                    window.location.assign(url.toString());
+                }, 250);
+            });
+            return;
+        }
+
+        const tableBody = document.querySelector('#' + tableId + '-table-view tbody');
+        const cardsContainer = document.getElementById(tableId + '-cards-view');
+        if (!tableBody && !cardsContainer) return;
+
+        const tableRows = tableBody ? Array.from(tableBody.querySelectorAll('tr.student-record')) : [];
+        const cardItems = cardsContainer ? Array.from(cardsContainer.querySelectorAll('.student-record')) : [];
+        const emptyRowId = tableId + '-search-empty-row';
+        const emptyCardsId = tableId + '-search-empty-cards';
+
+        function getSearchText(el) {
+            if (!el) return '';
+            if (!el.dataset.searchText) {
+                el.dataset.searchText = (el.textContent || '')
+                    .toLowerCase()
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+            return el.dataset.searchText;
+        }
+
+        function ensureTableEmptyState() {
+            if (!tableBody) return null;
+            let row = document.getElementById(emptyRowId);
+            if (!row) {
+                row = document.createElement('tr');
+                row.id = emptyRowId;
+                row.className = 'hidden';
+                const colCount = tableBody.parentElement ? tableBody.parentElement.querySelectorAll('thead th').length : 1;
+                row.innerHTML = '<td colspan="' + colCount + '" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400 text-xs">No matching records</td>';
+                tableBody.appendChild(row);
+            }
+            return row;
+        }
+
+        function ensureCardsEmptyState() {
+            if (!cardsContainer) return null;
+            let box = document.getElementById(emptyCardsId);
+            if (!box) {
+                box = document.createElement('div');
+                box.id = emptyCardsId;
+                box.className = 'hidden p-6 text-center text-gray-500 dark:text-gray-400 text-xs';
+                box.innerHTML = '<i class="fas fa-search text-xl opacity-50 mb-2"></i><p>No matching records</p>';
+                cardsContainer.appendChild(box);
+            }
+            return box;
+        }
+
+        const tableEmptyState = ensureTableEmptyState();
+        const cardsEmptyState = ensureCardsEmptyState();
+        let debounceTimer = null;
+
+        function applySearch() {
+            const term = (searchInput.value || '').toLowerCase().trim();
+
+            let visibleTable = 0;
+            for (let i = 0; i < tableRows.length; i++) {
+                const row = tableRows[i];
+                const visible = !term || getSearchText(row).indexOf(term) !== -1;
+                row.style.display = visible ? '' : 'none';
+                if (visible) visibleTable++;
+            }
+
+            let visibleCards = 0;
+            for (let i = 0; i < cardItems.length; i++) {
+                const card = cardItems[i];
+                const visible = !term || getSearchText(card).indexOf(term) !== -1;
+                card.style.display = visible ? '' : 'none';
+                if (visible) visibleCards++;
+            }
+
+            if (tableEmptyState) {
+                if (term && visibleTable === 0) tableEmptyState.classList.remove('hidden');
+                else tableEmptyState.classList.add('hidden');
+            }
+
+            if (cardsEmptyState) {
+                if (term && visibleCards === 0) cardsEmptyState.classList.remove('hidden');
+                else cardsEmptyState.classList.add('hidden');
+            }
+
+            document.dispatchEvent(new CustomEvent("mobileTableFiltered", { detail: { tableId: tableId } }));
+        }
+
+        searchInput.addEventListener('input', function() {
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(applySearch, 80);
+        });
+    }
     
     // Initialize view based on screen size or saved preference
     document.addEventListener('DOMContentLoaded', function() {
         const tableId = '<?= $options['table_id'] ?>';
+        const renderMode = '<?= htmlspecialchars($options['render_mode']) ?>';
         const savedView = localStorage.getItem('table-view-' + tableId);
-        const defaultView = window.innerWidth >= 1024 ? 'table' : 'cards';
+        let defaultView = window.innerWidth >= 1024 ? 'table' : 'cards';
+        if (renderMode === 'table') defaultView = 'table';
+        if (renderMode === 'cards') defaultView = 'cards';
         
         toggleTableView(tableId, savedView || defaultView);
+        initMobileTableSearch(tableId);
     });
     </script>
     
