@@ -73,7 +73,7 @@ if (!ob_get_level() && !ini_get('zlib.output_compression')) {
 // -----------------------------
 // On cPanel, 'localhost' is usually best because it uses the MySQL socket.
 // 127.0.0.1 forces TCP and can fail on some shared hosts.
-$host     = '91.204.209.23';
+$host     = 'localhost';
 $dbname   = 'finotekv_Finot';
 $username = 'finotekv_system';
 $password = 'Finoteselam.27';
