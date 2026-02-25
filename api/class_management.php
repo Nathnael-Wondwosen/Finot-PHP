@@ -453,22 +453,63 @@ function assignTeacher() {
     }
     
     try {
-        // For homeroom teacher, deactivate previous homeroom teacher
-        if ($role === 'homeroom') {
-            $stmt = $pdo->prepare("UPDATE class_teachers SET is_active = 0 WHERE class_id = ? AND role = 'homeroom'");
-            $stmt->execute([$class_id]);
-        }
-        
-        // Assign new teacher
+        $pdo->beginTransaction();
+
+        // 1) Reactivate exact existing row if present
         $stmt = $pdo->prepare("
-            INSERT INTO class_teachers (class_id, teacher_id, role, assigned_date, is_active) 
-            VALUES (?, ?, ?, CURDATE(), 1)
-            ON DUPLICATE KEY UPDATE teacher_id = ?, is_active = 1, assigned_date = CURDATE()
+            SELECT id
+            FROM class_teachers
+            WHERE class_id = ? AND teacher_id = ? AND role = ?
+            LIMIT 1
         ");
-        $stmt->execute([$class_id, $teacher_id, $role, $teacher_id]);
+        $stmt->execute([$class_id, $teacher_id, $role]);
+        $keepId = (int)($stmt->fetchColumn() ?: 0);
+
+        if ($keepId > 0) {
+            $stmt = $pdo->prepare("UPDATE class_teachers SET is_active = 1, assigned_date = CURDATE() WHERE id = ?");
+            $stmt->execute([$keepId]);
+        } else {
+            // 2) Reuse any existing row for this class+role if available
+            $stmt = $pdo->prepare("
+                SELECT id
+                FROM class_teachers
+                WHERE class_id = ? AND role = ?
+                ORDER BY id ASC
+                LIMIT 1
+            ");
+            $stmt->execute([$class_id, $role]);
+            $roleRowId = (int)($stmt->fetchColumn() ?: 0);
+
+            if ($roleRowId > 0) {
+                $stmt = $pdo->prepare("
+                    UPDATE class_teachers
+                    SET teacher_id = ?, is_active = 1, assigned_date = CURDATE()
+                    WHERE id = ?
+                ");
+                $stmt->execute([$teacher_id, $roleRowId]);
+                $keepId = $roleRowId;
+            } else {
+                // 3) Insert new row
+                $stmt = $pdo->prepare("
+                    INSERT INTO class_teachers (class_id, teacher_id, role, assigned_date, is_active)
+                    VALUES (?, ?, ?, CURDATE(), 1)
+                ");
+                $stmt->execute([$class_id, $teacher_id, $role]);
+                $keepId = (int)$pdo->lastInsertId();
+            }
+        }
+
+        // Keep one active assignment per class+role to avoid duplicate active role rows.
+        $stmt = $pdo->prepare("UPDATE class_teachers SET is_active = 0 WHERE class_id = ? AND role = ? AND id <> ?");
+        $stmt->execute([$class_id, $role, $keepId]);
+
+        $pdo->commit();
         
         echo json_encode(['success' => true, 'message' => 'Teacher assigned successfully']);
     } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         echo json_encode(['success' => false, 'message' => 'Error assigning teacher: ' . $e->getMessage()]);
     }
 }

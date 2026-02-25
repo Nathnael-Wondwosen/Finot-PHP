@@ -2,9 +2,15 @@
 session_start();
 require 'config.php';
 
+function tableExists(PDO $pdo, $tableName) {
+    $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1");
+    $stmt->execute([$tableName]);
+    return (bool)$stmt->fetchColumn();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = trim((string)($_POST['username'] ?? ''));
+    $password = (string)($_POST['password'] ?? '');
     
     try {
         $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
@@ -12,13 +18,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch();
         
         if ($admin && password_verify($password, $admin['password_hash'])) {
+            unset($_SESSION['portal_user_id'], $_SESSION['portal_role'], $_SESSION['portal_teacher_id']);
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_username'] = $admin['username'];
             header('Location: dashboard.php');
             exit;
-        } else {
-            $error = "Invalid username or password";
         }
+
+        if (tableExists($pdo, 'portal_users')) {
+            $stmt = $pdo->prepare("
+                SELECT pu.id, pu.username, pu.password_hash, pu.role, pu.teacher_id, pu.is_active
+                FROM portal_users pu
+                WHERE pu.username = ?
+                LIMIT 1
+            ");
+            $stmt->execute([$username]);
+            $portalUser = $stmt->fetch();
+
+            if ($portalUser && (int)$portalUser['is_active'] === 1 && password_verify($password, $portalUser['password_hash'])) {
+                unset($_SESSION['admin_id'], $_SESSION['admin_username']);
+                $_SESSION['portal_user_id'] = (int)$portalUser['id'];
+                $_SESSION['portal_role'] = (string)$portalUser['role'];
+                $_SESSION['portal_teacher_id'] = (int)$portalUser['teacher_id'];
+
+                $upd = $pdo->prepare("UPDATE portal_users SET last_login_at = NOW() WHERE id = ?");
+                $upd->execute([(int)$portalUser['id']]);
+
+                if ($portalUser['role'] === 'teacher') {
+                    header('Location: portal/teacher/dashboard.php');
+                    exit;
+                }
+                if ($portalUser['role'] === 'homeroom') {
+                    header('Location: portal/homeroom/dashboard.php');
+                    exit;
+                }
+            }
+        }
+
+        $error = "Invalid username or password";
     } catch (PDOException $e) {
         $error = "Database error: " . $e->getMessage();
     }
@@ -30,12 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>System Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 class="text-2xl font-bold text-center mb-6">Admin Login</h1>
+        <h1 class="text-2xl font-bold text-center mb-6">System Login</h1>
         
         <?php if (isset($error)): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -60,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         
         <div class="mt-4 text-center">
-            <p class="text-gray-600">Don't have an account? <a href="signup.php" class="text-blue-600 hover:underline">Sign up here</a></p>
+            <p class="text-gray-600 text-sm">Admin, Teacher, and Homeroom users can login here.</p>
         </div>
     </div>
 </body>

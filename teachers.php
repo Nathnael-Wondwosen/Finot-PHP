@@ -7,6 +7,16 @@ require 'includes/security_helpers.php';
 // Require admin authentication
 requireAdminLogin();
 
+function tableExists(PDO $pdo, string $tableName): bool {
+    try {
+        $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1");
+        $stmt->execute([$tableName]);
+        return (bool)$stmt->fetchColumn();
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
@@ -15,9 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'get_teachers':
                 $search = $_POST['search'] ?? '';
+                $hasPortalUsers = tableExists($pdo, 'portal_users');
                 
                 $sql = "SELECT *, 
-                        (SELECT COUNT(*) FROM class_teachers ct WHERE ct.teacher_id = t.id AND ct.is_active = 1) as class_count
+                        (SELECT COUNT(*) FROM class_teachers ct WHERE ct.teacher_id = t.id AND ct.is_active = 1) as class_count";
+                if ($hasPortalUsers) {
+                    $sql .= ",
+                        (SELECT COUNT(*) FROM portal_users pu WHERE pu.teacher_id = t.id AND pu.role = 'teacher') as teacher_portal_count,
+                        (SELECT COUNT(*) FROM portal_users pu WHERE pu.teacher_id = t.id AND pu.role = 'homeroom') as homeroom_portal_count";
+                } else {
+                    $sql .= ",
+                        0 as teacher_portal_count,
+                        0 as homeroom_portal_count";
+                }
+                $sql .= "
                         FROM teachers t WHERE 1=1";
                 $params = [];
                 
@@ -127,6 +148,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $classes = $stmt->fetchAll();
                 
                 echo json_encode(['success' => true, 'teacher' => $teacher, 'classes' => $classes]);
+                break;
+
+            case 'get_portal_access':
+                if (!tableExists($pdo, 'portal_users')) {
+                    echo json_encode(['success' => false, 'message' => 'portal_users table not found. Run phase2 migration first.']);
+                    break;
+                }
+
+                $teacher_id = (int)($_POST['teacher_id'] ?? 0);
+                if (!$teacher_id) {
+                    echo json_encode(['success' => false, 'message' => 'Teacher ID is required']);
+                    break;
+                }
+
+                $stmt = $pdo->prepare("
+                    SELECT id, username, role, is_active, last_login_at
+                    FROM portal_users
+                    WHERE teacher_id = ?
+                    ORDER BY role ASC
+                ");
+                $stmt->execute([$teacher_id]);
+                $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                echo json_encode(['success' => true, 'accounts' => $accounts]);
+                break;
+
+            case 'save_portal_access':
+                if (!tableExists($pdo, 'portal_users')) {
+                    echo json_encode(['success' => false, 'message' => 'portal_users table not found. Run phase2 migration first.']);
+                    break;
+                }
+
+                $teacher_id = (int)($_POST['teacher_id'] ?? 0);
+                $role = trim((string)($_POST['role'] ?? ''));
+                $username = trim((string)($_POST['username'] ?? ''));
+                $password = (string)($_POST['password'] ?? '');
+                $is_active = (int)($_POST['is_active'] ?? 1) === 1 ? 1 : 0;
+
+                if (!$teacher_id) {
+                    echo json_encode(['success' => false, 'message' => 'Teacher ID is required']);
+                    break;
+                }
+                if (!in_array($role, ['teacher', 'homeroom'], true)) {
+                    echo json_encode(['success' => false, 'message' => 'Invalid role']);
+                    break;
+                }
+                if ($username === '') {
+                    echo json_encode(['success' => false, 'message' => 'Username is required']);
+                    break;
+                }
+
+                $stmt = $pdo->prepare("SELECT id FROM teachers WHERE id = ? LIMIT 1");
+                $stmt->execute([$teacher_id]);
+                if (!$stmt->fetchColumn()) {
+                    echo json_encode(['success' => false, 'message' => 'Teacher not found']);
+                    break;
+                }
+
+                $stmt = $pdo->prepare("SELECT id FROM portal_users WHERE teacher_id = ? AND role = ? LIMIT 1");
+                $stmt->execute([$teacher_id, $role]);
+                $existingId = $stmt->fetchColumn();
+
+                if ($existingId) {
+                    if ($password !== '') {
+                        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+                        $stmt = $pdo->prepare("
+                            UPDATE portal_users
+                            SET username = ?, password_hash = ?, is_active = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([$username, $password_hash, $is_active, $existingId]);
+                    } else {
+                        $stmt = $pdo->prepare("
+                            UPDATE portal_users
+                            SET username = ?, is_active = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([$username, $is_active, $existingId]);
+                    }
+                    echo json_encode(['success' => true, 'message' => 'Portal account updated successfully']);
+                    break;
+                }
+
+                if ($password === '') {
+                    echo json_encode(['success' => false, 'message' => 'Password is required for new account']);
+                    break;
+                }
+
+                $password_hash = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("
+                    INSERT INTO portal_users (username, password_hash, role, teacher_id, is_active)
+                    VALUES (?, ?, ?, ?, ?)
+                ");
+                $stmt->execute([$username, $password_hash, $role, $teacher_id, $is_active]);
+
+                echo json_encode(['success' => true, 'message' => 'Portal account created successfully']);
+                break;
+
+            case 'delete_portal_access':
+                if (!tableExists($pdo, 'portal_users')) {
+                    echo json_encode(['success' => false, 'message' => 'portal_users table not found. Run phase2 migration first.']);
+                    break;
+                }
+
+                $teacher_id = (int)($_POST['teacher_id'] ?? 0);
+                $role = trim((string)($_POST['role'] ?? ''));
+
+                if (!$teacher_id || !in_array($role, ['teacher', 'homeroom'], true)) {
+                    echo json_encode(['success' => false, 'message' => 'Teacher and role are required']);
+                    break;
+                }
+
+                $stmt = $pdo->prepare("DELETE FROM portal_users WHERE teacher_id = ? AND role = ?");
+                $stmt->execute([$teacher_id, $role]);
+                echo json_encode(['success' => true, 'message' => 'Portal account removed successfully']);
                 break;
                 
             default:
@@ -265,6 +401,68 @@ ob_start();
     </div>
 </div>
 
+<!-- Portal Access Modal -->
+<div id="portal-access-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-2/3 shadow-lg rounded-xl bg-white dark:bg-gray-800 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Portal Access Management</h3>
+            <button onclick="closePortalAccessModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        <div class="py-4 space-y-5">
+            <div id="portal-access-status" class="text-sm text-gray-600 dark:text-gray-300"></div>
+
+            <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Last Login</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portal-access-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tr><td colspan="5" class="px-4 py-3 text-gray-500">No accounts loaded</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <form id="portal-access-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="portal-teacher-id" value="">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role *</label>
+                    <select id="portal-role" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                        <option value="teacher">Teacher</option>
+                        <option value="homeroom">Homeroom</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username *</label>
+                    <input type="text" id="portal-username" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password (leave blank to keep existing)</label>
+                    <input type="password" id="portal-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                    <select id="portal-is-active" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                        <option value="1">Active</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2 flex justify-end gap-2">
+                    <button type="button" onclick="resetPortalForm()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium">Reset</button>
+                    <button type="submit" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium">Save Portal Access</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <?php
 $content = ob_get_clean();
 
@@ -272,6 +470,7 @@ $page_script = '
 <script>
 // Global variables
 let currentTeacherId = null;
+let currentPortalTeacherId = null;
 
 // Initialize page
 document.addEventListener("DOMContentLoaded", function() {
@@ -286,6 +485,11 @@ document.addEventListener("DOMContentLoaded", function() {
     // Handle search
     document.getElementById("teacher-search").addEventListener("input", function() {
         loadTeachers(this.value);
+    });
+
+    document.getElementById("portal-access-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        savePortalAccess();
     });
 });
 
@@ -313,6 +517,17 @@ function loadTeachers(search = "") {
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="font-medium text-gray-900 dark:text-white">${teacher.full_name}</div>
+                        <div class="mt-1 flex flex-wrap gap-1">
+                            ${parseInt(teacher.teacher_portal_count || 0, 10) > 0
+                                ? `<span class="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Teacher Login</span>`
+                                : ``}
+                            ${parseInt(teacher.homeroom_portal_count || 0, 10) > 0
+                                ? `<span class="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Homeroom Login</span>`
+                                : ``}
+                            ${(parseInt(teacher.teacher_portal_count || 0, 10) === 0 && parseInt(teacher.homeroom_portal_count || 0, 10) === 0)
+                                ? `<span class="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">No Portal Access</span>`
+                                : ``}
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         ${teacher.email ? `<div>${teacher.email}</div>` : ""}
@@ -338,6 +553,9 @@ function loadTeachers(search = "") {
                         </button>
                         <button onclick="openEditTeacherModal(${teacher.id})" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
                             <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="openPortalAccessModal(${teacher.id})" class="text-amber-600 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300 mr-3" title="Portal credentials">
+                            <i class="fas fa-key"></i>
                         </button>
                         <button onclick="deleteTeacher(${teacher.id})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                             <i class="fas fa-trash"></i>
@@ -567,6 +785,161 @@ function viewTeacherDetails(teacherId) {
 // Close teacher details modal
 function closeTeacherDetailsModal() {
     document.getElementById("teacher-details-modal").classList.add("hidden");
+}
+
+function setPortalStatus(message, isError = false) {
+    const el = document.getElementById("portal-access-status");
+    el.textContent = message;
+    el.className = isError ? "text-sm text-red-600 dark:text-red-400" : "text-sm text-gray-600 dark:text-gray-300";
+}
+
+function resetPortalForm() {
+    document.getElementById("portal-role").value = "teacher";
+    document.getElementById("portal-username").value = "";
+    document.getElementById("portal-password").value = "";
+    document.getElementById("portal-is-active").value = "1";
+}
+
+function closePortalAccessModal() {
+    document.getElementById("portal-access-modal").classList.add("hidden");
+    currentPortalTeacherId = null;
+}
+
+function renderPortalAccounts(accounts) {
+    const tbody = document.getElementById("portal-access-table-body");
+    if (!accounts || accounts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-3 text-gray-500">No portal accounts for this teacher yet.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = accounts.map(account => `
+        <tr>
+            <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">${account.role}</td>
+            <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">${account.username}</td>
+            <td class="px-4 py-2 text-sm">
+                ${account.is_active == 1
+                    ? `<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>`
+                    : `<span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Disabled</span>`}
+            </td>
+            <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">${account.last_login_at || "-"}</td>
+            <td class="px-4 py-2 text-sm">
+                <button onclick="prefillPortalForm(&quot;${account.role}&quot;, &quot;${account.username}&quot;, &quot;${account.is_active}&quot;)" class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                <button onclick="deletePortalAccess(&quot;${account.role}&quot;)" class="text-red-600 hover:text-red-900">Remove</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function prefillPortalForm(role, username, isActive) {
+    document.getElementById("portal-role").value = role;
+    document.getElementById("portal-username").value = username;
+    document.getElementById("portal-password").value = "";
+    document.getElementById("portal-is-active").value = String(isActive);
+}
+
+function openPortalAccessModal(teacherId) {
+    currentPortalTeacherId = teacherId;
+    document.getElementById("portal-teacher-id").value = String(teacherId);
+    resetPortalForm();
+    document.getElementById("portal-access-modal").classList.remove("hidden");
+    loadPortalAccess(teacherId);
+}
+
+function loadPortalAccess(teacherId) {
+    setPortalStatus("Loading portal accounts...");
+    fetch(window.location.href, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "action=get_portal_access&teacher_id=" + encodeURIComponent(teacherId)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            setPortalStatus(data.message || "Failed to load portal accounts", true);
+            renderPortalAccounts([]);
+            return;
+        }
+        renderPortalAccounts(data.accounts || []);
+        setPortalStatus("Portal accounts loaded.");
+    })
+    .catch(() => {
+        setPortalStatus("Network error while loading portal accounts", true);
+        renderPortalAccounts([]);
+    });
+}
+
+function savePortalAccess() {
+    const teacherId = currentPortalTeacherId || parseInt(document.getElementById("portal-teacher-id").value || "0", 10);
+    const role = document.getElementById("portal-role").value;
+    const username = document.getElementById("portal-username").value.trim();
+    const password = document.getElementById("portal-password").value;
+    const isActive = document.getElementById("portal-is-active").value;
+
+    if (!teacherId) {
+        setPortalStatus("Teacher context is missing.", true);
+        return;
+    }
+    if (!username) {
+        setPortalStatus("Username is required.", true);
+        return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("action", "save_portal_access");
+    formData.append("teacher_id", String(teacherId));
+    formData.append("role", role);
+    formData.append("username", username);
+    formData.append("password", password);
+    formData.append("is_active", isActive);
+
+    setPortalStatus("Saving portal account...");
+    fetch(window.location.href, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            setPortalStatus(data.message || "Failed to save portal account.", true);
+            return;
+        }
+        setPortalStatus(data.message || "Portal account saved.");
+        document.getElementById("portal-password").value = "";
+        loadPortalAccess(teacherId);
+    })
+    .catch(() => {
+        setPortalStatus("Network error while saving portal account.", true);
+    });
+}
+
+function deletePortalAccess(role) {
+    if (!currentPortalTeacherId) return;
+    if (!confirm("Remove " + role + " portal account for this teacher?")) return;
+
+    const formData = new URLSearchParams();
+    formData.append("action", "delete_portal_access");
+    formData.append("teacher_id", String(currentPortalTeacherId));
+    formData.append("role", role);
+
+    setPortalStatus("Removing portal account...");
+    fetch(window.location.href, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            setPortalStatus(data.message || "Failed to remove portal account.", true);
+            return;
+        }
+        setPortalStatus(data.message || "Portal account removed.");
+        loadPortalAccess(currentPortalTeacherId);
+    })
+    .catch(() => {
+        setPortalStatus("Network error while removing portal account.", true);
+    });
 }
 </script>
 ';

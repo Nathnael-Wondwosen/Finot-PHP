@@ -39,6 +39,12 @@ $nav_items = [
         'url' => 'results.php',
         'badge' => ''
     ],
+    'result_summary_mvp' => [
+        'title' => 'Result Summary MVP',
+        'icon' => 'fa-square-poll-horizontal',
+        'url' => 'result_summary_mvp.php',
+        'badge' => ''
+    ],
     'classes' => [
         'title' => 'Classes',
         'icon' => 'fa-chalkboard',
@@ -144,6 +150,8 @@ function renderAdminLayout($title = 'Admin Dashboard', $content = '', $page_scri
         $active_page = 'data_quality';
     } elseif ($current_page === 'results') {
         $active_page = 'results';
+    } elseif ($current_page === 'result_summary_mvp') {
+        $active_page = 'result_summary_mvp';
     } elseif ($current_page === 'youth_categorization') {
         $active_page = 'youth_categorization';
     }

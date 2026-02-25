@@ -5,6 +5,7 @@ define('CACHE_TTL_DASHBOARD', 300);
 define('CACHE_TTL_GENERAL', 600);
 define('APP_NAME', 'Finote Selam Learning Management System');
 define('APP_ENV', 'production');
+define('ATTENDANCE_REPORT_BASE_URL', 'https://attend.finoteselamss.org');
 
 // -----------------------------
 // 1) DEBUG / ERROR HANDLING
