@@ -15,6 +15,12 @@ function fail($message, $code = 400) {
     exit;
 }
 
+function ok(array $payload = [], int $code = 200): void {
+    http_response_code($code);
+    echo json_encode(array_merge(['success' => true], $payload));
+    exit;
+}
+
 function tableExists(PDO $pdo, $tableName) {
     $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1");
     $stmt->execute([$tableName]);
@@ -262,14 +268,18 @@ function studentsWithMarks(PDO $pdo, array $ctx) {
         ];
     }
 
-    echo json_encode([
-        'success' => true,
+    $lockMeta = getMarklistLockMeta($pdo, $classId, $courseId, $termId);
+
+    ok([
         'weights' => $weights,
         'students' => $rows,
         'count' => count($rows),
         'existing_rows' => $existingCount,
         'finalized_rows' => $finalizedCount,
-        'is_locked' => $finalizedCount > 0,
+        'is_locked' => ($finalizedCount > 0) || (bool)$lockMeta['is_locked'],
+        'lock_reason' => $lockMeta['reason'],
+        'weight_frozen' => $lockMeta['weight_frozen'],
+        'homeroom_status' => $lockMeta['homeroom_status'],
         'context_version' => $contextVersion
     ]);
 }
@@ -575,6 +585,11 @@ function saveMarks(PDO $pdo, array $ctx) {
         fail('No valid student rows to save', 422);
     }
 
+    $lockMeta = getMarklistLockMeta($pdo, $classId, $courseId, $termId);
+    if ($lockMeta['is_locked']) {
+        fail('Marklist is locked: ' . $lockMeta['reason'], 409);
+    }
+
     $currentVersion = getCurrentContextVersion($pdo, $classId, $courseId, $termId);
     if ($contextVersion !== '' && $currentVersion !== null && $contextVersion !== $currentVersion) {
         fail('This marklist was changed by another user. Reload first to avoid overwriting data.', 409);
@@ -597,6 +612,12 @@ function saveMarks(PDO $pdo, array $ctx) {
         if ($submittedFinalized) {
             fail('Cannot edit finalized mark rows. Ask admin to unfinalize first.', 409);
         }
+    }
+
+    $savedWeights = loadSavedWeights($pdo, $classId, $courseId, $termId);
+    $hasExistingRows = hasExistingMarksForContext($pdo, $classId, $courseId, $termId);
+    if ($hasExistingRows && $savedWeights !== null && !weightsEqual($weights, $savedWeights)) {
+        fail('Weights are frozen for this context after first mark entry. Keep existing weights or ask admin to reset.', 409);
     }
 
     $adminId = null;
@@ -771,8 +792,7 @@ function saveMarks(PDO $pdo, array $ctx) {
     }
 
     $latestVersion = getCurrentContextVersion($pdo, $classId, $courseId, $termId);
-    echo json_encode([
-        'success' => true,
+    ok([
         'message' => 'Marks and weights saved successfully',
         'weights' => $weights,
         'affected_rows' => $affected,
@@ -811,6 +831,90 @@ function loadWeights(PDO $pdo, $classId, $courseId, $termId) {
         'mid_exam_weight' => (float)$row['mid_exam_weight'],
         'final_exam_weight' => (float)$row['final_exam_weight'],
         'attendance_weight' => (float)$row['attendance_weight']
+    ];
+}
+
+function loadSavedWeights(PDO $pdo, int $classId, int $courseId, int $termId): ?array {
+    $stmt = $pdo->prepare("
+        SELECT
+            book_weight, assignment_weight, quiz_weight, mid_exam_weight, final_exam_weight, attendance_weight
+        FROM mark_weight_settings_mvp
+        WHERE class_id = ? AND course_id = ? AND term_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$classId, $courseId, $termId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        return null;
+    }
+    return sanitizeWeights($row);
+}
+
+function hasExistingMarksForContext(PDO $pdo, int $classId, int $courseId, int $termId): bool {
+    $stmt = $pdo->prepare("
+        SELECT 1
+        FROM student_course_marks_mvp
+        WHERE class_id = ? AND course_id = ? AND term_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$classId, $courseId, $termId]);
+    return (bool)$stmt->fetchColumn();
+}
+
+function weightsEqual(array $a, array $b): bool {
+    $wa = sanitizeWeights($a);
+    $wb = sanitizeWeights($b);
+    foreach (['book_weight','assignment_weight','quiz_weight','mid_exam_weight','final_exam_weight','attendance_weight'] as $k) {
+        if (round((float)$wa[$k], 2) !== round((float)$wb[$k], 2)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function getMarklistLockMeta(PDO $pdo, int $classId, int $courseId, int $termId): array {
+    $homeroomStatus = 'none';
+    if (tableExists($pdo, 'homeroom_term_matrix_submissions_mvp')) {
+        $stmt = $pdo->prepare("
+            SELECT status
+            FROM homeroom_term_matrix_submissions_mvp
+            WHERE class_id = ? AND term_id = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$classId, $termId]);
+        $value = $stmt->fetchColumn();
+        if ($value !== false && $value !== null) {
+            $homeroomStatus = (string)$value;
+        }
+    }
+
+    $finalizedSummaryRows = 0;
+    if (tableExists($pdo, 'student_term_result_summary_mvp')) {
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*)
+            FROM student_term_result_summary_mvp
+            WHERE class_id = ? AND term_id = ? AND is_finalized = 1
+        ");
+        $stmt->execute([$classId, $termId]);
+        $finalizedSummaryRows = (int)$stmt->fetchColumn();
+    }
+
+    $reason = null;
+    $isLocked = false;
+    if ($homeroomStatus === 'submitted') {
+        $isLocked = true;
+        $reason = 'homeroom already submitted matrix';
+    } elseif ($finalizedSummaryRows > 0) {
+        $isLocked = true;
+        $reason = 'admin/finalized term summary exists';
+    }
+
+    return [
+        'is_locked' => $isLocked,
+        'reason' => $reason,
+        'weight_frozen' => hasExistingMarksForContext($pdo, $classId, $courseId, $termId),
+        'homeroom_status' => $homeroomStatus,
+        'finalized_summary_rows' => $finalizedSummaryRows
     ];
 }
 

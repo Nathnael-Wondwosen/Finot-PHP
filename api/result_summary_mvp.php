@@ -12,6 +12,12 @@ function fail($message, $code = 400) {
     exit;
 }
 
+function ok(array $payload = [], int $code = 200): void {
+    http_response_code($code);
+    echo json_encode(array_merge(['success' => true], $payload));
+    exit;
+}
+
 function tableExists(PDO $pdo, $tableName) {
     $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1");
     $stmt->execute([$tableName]);
@@ -113,6 +119,10 @@ function recalculate(PDO $pdo) {
     $termId = (int)($_POST['term_id'] ?? $_GET['term_id'] ?? 0);
     if (!$classId || !$termId) {
         fail('class_id and term_id are required');
+    }
+    $force = (int)($_POST['force_recalculate'] ?? $_GET['force_recalculate'] ?? 0) === 1;
+    if (!$force && hasAdminFinalizedTermSummary($pdo, $classId, $termId)) {
+        fail('Summary is admin-finalized. Use force_recalculate=1 only when intentionally reopening workflow.', 409);
     }
 
     $studentsStmt = $pdo->prepare("
@@ -222,7 +232,7 @@ function recalculate(PDO $pdo) {
         throw $e;
     }
 
-    echo json_encode(['success' => true, 'message' => 'Summary recalculated', 'rows' => count($rows)]);
+    ok(['message' => 'Summary recalculated', 'rows' => count($rows)]);
 }
 
 function getSummary(PDO $pdo) {
@@ -251,6 +261,7 @@ function finalizeSummary(PDO $pdo) {
     $classId = (int)($_POST['class_id'] ?? 0);
     $termId = (int)($_POST['term_id'] ?? 0);
     if (!$classId || !$termId) fail('class_id and term_id are required');
+    assertTermReadyForAdminFinalize($pdo, $classId, $termId);
 
     $adminId = (int)($_SESSION['admin_id'] ?? 0);
     $stmt = $pdo->prepare("
@@ -259,7 +270,7 @@ function finalizeSummary(PDO $pdo) {
         WHERE class_id = ? AND term_id = ?
     ");
     $stmt->execute([$adminId, $classId, $termId]);
-    echo json_encode(['success' => true, 'message' => 'Summary finalized', 'affected' => $stmt->rowCount()]);
+    ok(['message' => 'Summary finalized', 'affected' => $stmt->rowCount()]);
 }
 
 function applyStatusToStudents(PDO $pdo) {
@@ -282,7 +293,7 @@ function applyStatusToStudents(PDO $pdo) {
         WHERE srs.class_id = ? AND srs.term_id = ? AND srs.is_finalized = 1
     ");
     $stmt->execute([$classId, $termId]);
-    echo json_encode(['success' => true, 'message' => 'Student statuses updated from finalized summary', 'affected' => $stmt->rowCount()]);
+    ok(['message' => 'Student statuses updated from finalized summary', 'affected' => $stmt->rowCount()]);
 }
 
 function getCourseSummary(PDO $pdo) {
@@ -327,12 +338,16 @@ function recalculateYearly(PDO $pdo) {
     if (!$classId) {
         fail('class_id is required');
     }
+    $force = (int)($_POST['force_recalculate'] ?? $_GET['force_recalculate'] ?? 0) === 1;
 
     $classStmt = $pdo->prepare("SELECT academic_year FROM classes WHERE id = ? LIMIT 1");
     $classStmt->execute([$classId]);
     $academicYear = (string)$classStmt->fetchColumn();
     if ($academicYear === '') {
         fail('Academic year not found for selected class', 422);
+    }
+    if (!$force && hasAdminFinalizedYearlySummary($pdo, $classId, $academicYear)) {
+        fail('Yearly summary is admin-finalized. Use force_recalculate=1 only when intentionally reopening workflow.', 409);
     }
 
     $studentsStmt = $pdo->prepare("
@@ -457,7 +472,7 @@ function recalculateYearly(PDO $pdo) {
         throw $e;
     }
 
-    echo json_encode(['success' => true, 'message' => 'Yearly summary recalculated', 'rows' => count($rows), 'academic_year' => $academicYear]);
+    ok(['message' => 'Yearly summary recalculated', 'rows' => count($rows), 'academic_year' => $academicYear]);
 }
 
 function getYearlySummary(PDO $pdo) {
@@ -500,6 +515,15 @@ function finalizeYearlySummary(PDO $pdo) {
     if ($academicYear === '') {
         fail('Academic year not found for selected class', 422);
     }
+    $rowsStmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM student_year_result_summary_mvp
+        WHERE class_id = ? AND academic_year = ?
+    ");
+    $rowsStmt->execute([$classId, $academicYear]);
+    if ((int)$rowsStmt->fetchColumn() <= 0) {
+        fail('No yearly summary rows to finalize. Recalculate yearly summary first.', 422);
+    }
 
     $adminId = (int)($_SESSION['admin_id'] ?? 0);
     $stmt = $pdo->prepare("
@@ -508,7 +532,7 @@ function finalizeYearlySummary(PDO $pdo) {
         WHERE class_id = ? AND academic_year = ?
     ");
     $stmt->execute([$adminId, $classId, $academicYear]);
-    echo json_encode(['success' => true, 'message' => 'Yearly summary finalized', 'affected' => $stmt->rowCount()]);
+    ok(['message' => 'Yearly summary finalized', 'affected' => $stmt->rowCount()]);
 }
 
 function applyYearlyStatusToStudents(PDO $pdo) {
@@ -537,7 +561,7 @@ function applyYearlyStatusToStudents(PDO $pdo) {
         WHERE y.class_id = ? AND y.academic_year = ? AND y.is_finalized = 1
     ");
     $stmt->execute([$classId, $academicYear]);
-    echo json_encode(['success' => true, 'message' => 'Student statuses updated from finalized yearly summary', 'affected' => $stmt->rowCount()]);
+    ok(['message' => 'Student statuses updated from finalized yearly summary', 'affected' => $stmt->rowCount()]);
 }
 
 function getNextGradeValue(string $grade): ?string {
@@ -838,8 +862,7 @@ function getHomeroomStatus(PDO $pdo) {
         fail('class_id and term_id are required');
     }
     if (!tableExists($pdo, 'homeroom_term_matrix_submissions_mvp')) {
-        echo json_encode(['success' => true, 'status' => 'none']);
-        return;
+        ok(['status' => 'none']);
     }
     $stmt = $pdo->prepare("
         SELECT status, submitted_at, updated_at
@@ -850,11 +873,9 @@ function getHomeroomStatus(PDO $pdo) {
     $stmt->execute([$classId, $termId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
-        echo json_encode(['success' => true, 'status' => 'none']);
-        return;
+        ok(['status' => 'none']);
     }
-    echo json_encode([
-        'success' => true,
+    ok([
         'status' => (string)$row['status'],
         'submitted_at' => $row['submitted_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null
@@ -971,8 +992,7 @@ function getReadiness(PDO $pdo) {
     ")->fetchAll(PDO::FETCH_ASSOC);
 
     if (!count($classes)) {
-        echo json_encode(['success' => true, 'rows' => [], 'summary' => ['classes' => 0, 'ready_for_admin' => 0, 'with_new_updates' => 0]]);
-        return;
+        ok(['rows' => [], 'summary' => ['classes' => 0, 'ready_for_admin' => 0, 'with_new_updates' => 0]]);
     }
 
     $classIds = array_map(static fn($c) => (int)$c['id'], $classes);
@@ -1119,8 +1139,7 @@ function getReadiness(PDO $pdo) {
         ];
     }
 
-    echo json_encode([
-        'success' => true,
+    ok([
         'rows' => $rows,
         'summary' => [
             'classes' => count($rows),
@@ -1128,6 +1147,89 @@ function getReadiness(PDO $pdo) {
             'with_new_updates' => $withNewUpdates
         ]
     ]);
+}
+
+function hasAdminFinalizedTermSummary(PDO $pdo, int $classId, int $termId): bool {
+    $stmt = $pdo->prepare("
+        SELECT 1
+        FROM student_term_result_summary_mvp
+        WHERE class_id = ? AND term_id = ? AND is_finalized = 1 AND finalized_by_admin_id IS NOT NULL
+        LIMIT 1
+    ");
+    $stmt->execute([$classId, $termId]);
+    return (bool)$stmt->fetchColumn();
+}
+
+function hasAdminFinalizedYearlySummary(PDO $pdo, int $classId, string $academicYear): bool {
+    $stmt = $pdo->prepare("
+        SELECT 1
+        FROM student_year_result_summary_mvp
+        WHERE class_id = ? AND academic_year = ? AND is_finalized = 1 AND finalized_by_admin_id IS NOT NULL
+        LIMIT 1
+    ");
+    $stmt->execute([$classId, $academicYear]);
+    return (bool)$stmt->fetchColumn();
+}
+
+function assertTermReadyForAdminFinalize(PDO $pdo, int $classId, int $termId): void {
+    $rowsStmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM student_term_result_summary_mvp
+        WHERE class_id = ? AND term_id = ?
+    ");
+    $rowsStmt->execute([$classId, $termId]);
+    if ((int)$rowsStmt->fetchColumn() <= 0) {
+        fail('No term summary rows to finalize. Recalculate first.', 422);
+    }
+
+    if (!tableExists($pdo, 'homeroom_term_matrix_submissions_mvp')) {
+        fail('Homeroom matrix table is missing. Homeroom submission is required before finalization.', 422);
+    }
+
+    $statusStmt = $pdo->prepare("
+        SELECT status, updated_at
+        FROM homeroom_term_matrix_submissions_mvp
+        WHERE class_id = ? AND term_id = ?
+        LIMIT 1
+    ");
+    $statusStmt->execute([$classId, $termId]);
+    $statusRow = $statusStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$statusRow || (string)$statusRow['status'] !== 'submitted') {
+        fail('Homeroom matrix must be submitted before admin finalization.', 422);
+    }
+
+    $latestTeacherStmt = $pdo->prepare("
+        SELECT MAX(updated_at)
+        FROM student_course_marks_mvp
+        WHERE class_id = ? AND term_id = ?
+    ");
+    $latestTeacherStmt->execute([$classId, $termId]);
+    $latestTeacher = $latestTeacherStmt->fetchColumn();
+
+    $homeroomUpdated = $statusRow['updated_at'] ?? null;
+    if ($latestTeacher && $homeroomUpdated && strtotime((string)$latestTeacher) > strtotime((string)$homeroomUpdated)) {
+        fail('Teacher marks changed after homeroom submission. Ask homeroom to reopen/review and submit again.', 409);
+    }
+
+    $expectedCoursesStmt = $pdo->prepare("
+        SELECT COUNT(DISTINCT course_id)
+        FROM course_teachers
+        WHERE class_id = ? AND is_active = 1
+    ");
+    $expectedCoursesStmt->execute([$classId]);
+    $expectedCourses = (int)$expectedCoursesStmt->fetchColumn();
+
+    $submittedCoursesStmt = $pdo->prepare("
+        SELECT COUNT(DISTINCT course_id)
+        FROM student_course_marks_mvp
+        WHERE class_id = ? AND term_id = ?
+    ");
+    $submittedCoursesStmt->execute([$classId, $termId]);
+    $submittedCourses = (int)$submittedCoursesStmt->fetchColumn();
+
+    if ($expectedCourses > 0 && $submittedCourses < $expectedCourses) {
+        fail('Not all active class courses have submitted marklists for this term.', 422);
+    }
 }
 
 function columnExists(PDO $pdo, string $table, string $column): bool {

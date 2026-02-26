@@ -10,6 +10,12 @@ function fail($message, $code = 400) {
     exit;
 }
 
+function ok(array $payload = [], int $code = 200): void {
+    http_response_code($code);
+    echo json_encode(array_merge(['success' => true], $payload));
+    exit;
+}
+
 function tableExists(PDO $pdo, $tableName) {
     $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1");
     $stmt->execute([$tableName]);
@@ -366,6 +372,10 @@ function finalizeHistory(PDO $pdo, $ctx) {
     $termId = (int)($_POST['term_id'] ?? 0);
     if (!$classId || !$termId) fail('class_id and term_id are required');
     if (!ensureClassAccess($pdo, $ctx, $classId)) fail('Access denied for selected class', 403);
+    $adminFinalized = isAdminFinalizedTerm($pdo, $classId, $termId);
+    if ($adminFinalized) {
+        fail('Admin has already finalized this term summary. Reopen is blocked until admin unlocks.', 409);
+    }
     saveOrSubmitMatrix($pdo, $ctx, 'submitted');
 }
 
@@ -376,6 +386,10 @@ function reopenHistory(PDO $pdo, $ctx) {
     $termId = (int)($_POST['term_id'] ?? 0);
     if (!$classId || !$termId) fail('class_id and term_id are required');
     if (!ensureClassAccess($pdo, $ctx, $classId)) fail('Access denied for selected class', 403);
+    $adminFinalized = isAdminFinalizedTerm($pdo, $classId, $termId);
+    if ($adminFinalized) {
+        fail('Admin has already finalized this term summary. Reopen is blocked until admin unlocks.', 409);
+    }
     saveOrSubmitMatrix($pdo, $ctx, 'draft');
 }
 
@@ -395,6 +409,14 @@ function saveAttendance(PDO $pdo, $ctx) {
     }
     if (!ensureClassAccess($pdo, $ctx, $classId)) {
         fail('Access denied for selected class', 403);
+    }
+    $adminFinalized = isAdminFinalizedTerm($pdo, $classId, $termId);
+    if ($adminFinalized) {
+        fail('Attendance is locked because admin already finalized this term summary.', 409);
+    }
+    $matrixState = getMatrixStatusForContext($pdo, $classId, $termId);
+    if (($matrixState['status'] ?? 'none') === 'submitted') {
+        fail('Attendance is locked after homeroom submission. Reopen to draft first.', 409);
     }
 
     $rows = json_decode($rowsJson, true);
@@ -456,8 +478,7 @@ function saveAttendance(PDO $pdo, $ctx) {
             ]);
         }
         $pdo->commit();
-        echo json_encode([
-            'success' => true,
+        ok([
             'message' => 'Attendance marks saved successfully.',
             'saved' => count($preparedRows)
         ]);
@@ -625,6 +646,13 @@ function saveOrSubmitMatrix(PDO $pdo, $ctx, string $status) {
     }
 
     ensureMatrixSubmissionTable($pdo);
+    if (isAdminFinalizedTerm($pdo, $classId, $termId)) {
+        fail('Term summary is admin-finalized and locked. Ask admin to unlock before changing matrix.', 409);
+    }
+
+    if ($status === 'submitted') {
+        assertTeacherDataReadyForSubmission($pdo, $classId, $termId);
+    }
 
     $submittedAt = $status === 'submitted' ? date('Y-m-d H:i:s') : null;
 
@@ -660,8 +688,7 @@ function saveOrSubmitMatrix(PDO $pdo, $ctx, string $status) {
         $msg = $status === 'submitted'
             ? "Matrix submitted and finalized for admin review ({$syncedRows} students)."
             : 'Matrix draft saved.';
-        echo json_encode([
-            'success' => true,
+        ok([
             'message' => $msg,
             'status' => $status
         ]);
@@ -670,5 +697,76 @@ function saveOrSubmitMatrix(PDO $pdo, $ctx, string $status) {
             $pdo->rollBack();
         }
         throw $e;
+    }
+}
+
+function getMatrixStatusForContext(PDO $pdo, int $classId, int $termId): array {
+    if (!tableExists($pdo, 'homeroom_term_matrix_submissions_mvp')) {
+        return ['status' => 'none', 'updated_at' => null, 'submitted_at' => null];
+    }
+    $stmt = $pdo->prepare("
+        SELECT status, updated_at, submitted_at
+        FROM homeroom_term_matrix_submissions_mvp
+        WHERE class_id = ? AND term_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$classId, $termId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        return ['status' => 'none', 'updated_at' => null, 'submitted_at' => null];
+    }
+    return [
+        'status' => (string)$row['status'],
+        'updated_at' => $row['updated_at'] ? (string)$row['updated_at'] : null,
+        'submitted_at' => $row['submitted_at'] ? (string)$row['submitted_at'] : null
+    ];
+}
+
+function isAdminFinalizedTerm(PDO $pdo, int $classId, int $termId): bool {
+    if (!tableExists($pdo, 'student_term_result_summary_mvp')) {
+        return false;
+    }
+    $stmt = $pdo->prepare("
+        SELECT 1
+        FROM student_term_result_summary_mvp
+        WHERE class_id = ? AND term_id = ? AND is_finalized = 1 AND finalized_by_admin_id IS NOT NULL
+        LIMIT 1
+    ");
+    $stmt->execute([$classId, $termId]);
+    return (bool)$stmt->fetchColumn();
+}
+
+function assertTeacherDataReadyForSubmission(PDO $pdo, int $classId, int $termId): void {
+    $expectedStmt = $pdo->prepare("
+        SELECT COUNT(DISTINCT course_id)
+        FROM course_teachers
+        WHERE class_id = ? AND is_active = 1
+    ");
+    $expectedStmt->execute([$classId]);
+    $expectedCourses = (int)$expectedStmt->fetchColumn();
+    if ($expectedCourses <= 0) {
+        fail('No active course assignments found for this class. Cannot submit matrix.', 422);
+    }
+
+    $submittedStmt = $pdo->prepare("
+        SELECT COUNT(DISTINCT course_id)
+        FROM student_course_marks_mvp
+        WHERE class_id = ? AND term_id = ?
+    ");
+    $submittedStmt->execute([$classId, $termId]);
+    $submittedCourses = (int)$submittedStmt->fetchColumn();
+    if ($submittedCourses < $expectedCourses) {
+        fail('Teacher marklists are incomplete. Submit all assigned course marklists before homeroom submission.', 422);
+    }
+
+    $studentsStmt = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM class_enrollments
+        WHERE class_id = ? AND status = 'active'
+    ");
+    $studentsStmt->execute([$classId]);
+    $studentCount = (int)$studentsStmt->fetchColumn();
+    if ($studentCount <= 0) {
+        fail('No active students found for this class', 422);
     }
 }

@@ -2,6 +2,19 @@
 session_start();
 require 'config.php';
 
+function app_base_path(): string {
+    $scriptName = str_replace('\\', '/', (string)($_SERVER['SCRIPT_NAME'] ?? '/login.php'));
+    $base = rtrim(dirname($scriptName), '/');
+    return $base === '/' ? '' : $base;
+}
+
+function redirect_to(string $path): void {
+    $base = app_base_path();
+    $target = ($base !== '' ? $base : '') . '/' . ltrim($path, '/');
+    header('Location: ' . $target);
+    exit;
+}
+
 function tableExists(PDO $pdo, $tableName) {
     $stmt = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1");
     $stmt->execute([$tableName]);
@@ -21,8 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($_SESSION['portal_user_id'], $_SESSION['portal_role'], $_SESSION['portal_teacher_id']);
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_username'] = $admin['username'];
-            header('Location: dashboard.php');
-            exit;
+            redirect_to('dashboard.php');
         }
 
         if (tableExists($pdo, 'portal_users')) {
@@ -45,12 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $upd->execute([(int)$portalUser['id']]);
 
                 if ($portalUser['role'] === 'teacher') {
-                    header('Location: portal/teacher/dashboard.php');
-                    exit;
+                    redirect_to('portal/teacher/dashboard.php');
                 }
                 if ($portalUser['role'] === 'homeroom') {
-                    header('Location: portal/homeroom/dashboard.php');
-                    exit;
+                    redirect_to('portal/homeroom/dashboard.php');
                 }
             }
         }
