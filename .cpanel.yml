@@ -1,0 +1,16 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/finotekv/lms.finoteselamss.org
+    - /bin/mkdir -p "$DEPLOYPATH"
+    - /bin/rsync -a --delete \
+      --exclude ".git/" \
+      --exclude ".cpanel.yml" \
+      --exclude "uploads/" \
+      --exclude "cache/" \
+      --exclude "backups/" \
+      --exclude "error_log" \
+      --exclude "api/error_log" \
+      --exclude "parent_info_debug.log" \
+      --exclude "youth_registration_error.log" \
+      ./ "$DEPLOYPATH"/
