@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Attendance API</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { padding: 10px 15px; margin: 5px; background: #007cba; color: white; border: none; cursor: pointer; }
+        button:hover { background: #005a87; }
+        #result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px; }
+        pre { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Attendance API Test</h1>
+    
+    <button id="getStudents">Get All Students</button>
+    <button id="getStudent1">Get Student ID 1</button>
+    <button id="getReport">Get Attendance Report</button>
+    <button id="getInstrumentStudents">Get Instrument Students</button>
+    
+    <div id="result">
+        <h3>API Response:</h3>
+        <pre id="output">Click a button above to test the API</pre>
+    </div>
+
+    <script>
+        $('#getStudents').click(function() {
+            $('#output').text('Loading...');
+            $.ajax({
+                url: 'attendance_api.php?endpoint=students',
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    $('#output').text(JSON.stringify(data, null, 2));
+                },
+                error: function(xhr, status, error) {
+                    $('#output').text('Error: ' + error + '\nStatus: ' + xhr.status + '\nResponse: ' + xhr.responseText);
+                }
+            });
+        });
+        
+        $('#getStudent1').click(function() {
+            $('#output').text('Loading...');
+            $.ajax({
+                url: 'attendance_api.php?endpoint=student&id=1',
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    $('#output').text(JSON.stringify(data, null, 2));
+                },
+                error: function(xhr, status, error) {
+                    $('#output').text('Error: ' + error + '\nStatus: ' + xhr.status + '\nResponse: ' + xhr.responseText);
+                }
+            });
+        });
+        
+        $('#getReport').click(function() {
+            $('#output').text('Loading...');
+            $.ajax({
+                url: 'attendance_api.php?endpoint=attendance_report',
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    $('#output').text(JSON.stringify(data, null, 2));
+                },
+                error: function(xhr, status, error) {
+                    $('#output').text('Error: ' + error + '\nStatus: ' + xhr.status + '\nResponse: ' + xhr.responseText);
+                }
+            });
+        });
+        
+        $('#getInstrumentStudents').click(function() {
+            $('#output').text('Loading...');
+            $.ajax({
+                url: 'attendance_api.php?endpoint=instrument_students',
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    $('#output').text(JSON.stringify(data, null, 2));
+                },
+                error: function(xhr, status, error) {
+                    $('#output').text('Error: ' + error + '\nStatus: ' + xhr.status + '\nResponse: ' + xhr.responseText);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
