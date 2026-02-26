@@ -1,8 +1,6 @@
 <?php
 session_start();
-require __DIR__ . '/../../config.php';
-require __DIR__ . '/../../includes/security_helpers.php';
-require __DIR__ . '/../../includes/portal_auth.php';
+require_once __DIR__ . '/../../includes/bootstrap_portal.php';
 
 header('Content-Type: application/json');
 

@@ -1,6 +1,5 @@
 <?php
-require __DIR__ . '/../../config.php';
-require __DIR__ . '/../../includes/portal_auth.php';
+require_once __DIR__ . '/../../includes/bootstrap_portal.php';
 
 $ctx = getAuthContext();
 if (!$ctx || $ctx['actor'] !== 'portal' || ($ctx['portal_role'] ?? '') !== 'teacher') {
